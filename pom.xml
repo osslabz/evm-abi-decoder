@@ -8,8 +8,10 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
-    <description>Allows to decode raw input data from EVM tx (on Ethereum or a compatible chain like Avalanche, BSC stc) into processable format obtained from the contract's ABi definition (JSON).</description>
-    <url>https://github.com/rvullriede/evm-client</url>
+    <description>Allows to decode raw input data from a EVM smart contract call (on Ethereum or a compatible chain like
+        Avalanche, BSC stc) into processable format obtained from the contract's ABi definition (JSON).
+    </description>
+    <url>https://github.com/rvullriede/evm-abi-decoder</url>
 
     <properties>
         <java.version>17</java.version>
@@ -41,9 +43,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:ssh://git@github.com/rvullriede/evm-client.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/rvullriede/evm-client.git</developerConnection>
-        <url>https://github.com/rvullriede/evm-client</url>
+        <connection>scm:git:ssh://git@github.com/rvullriede/evm-abi-decoder.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/rvullriede/evm-abi-decoder.git</developerConnection>
+        <url>https://github.com/rvullriede/evm-abi-decoder</url>
         <tag>main</tag>
     </scm>
 
@@ -198,8 +200,8 @@
                 <configuration>
                     <release>${java.version}</release>
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
-                    <source>17</source>
-                    <target>17</target>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
                 </configuration>
             </plugin>
         </plugins>
