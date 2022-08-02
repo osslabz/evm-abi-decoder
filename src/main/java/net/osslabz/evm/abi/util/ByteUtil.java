@@ -48,7 +48,7 @@ public class ByteUtil {
     /**
      * Omitting sign indication byte.
      * <br><br>
-     * Instead of {@link org.spongycastle.util.BigIntegers#asUnsignedByteArray(BigInteger)}
+     * Instead of org.spongycastle.util.BigIntegers#asUnsignedByteArray(BigInteger
      * <br>we use this custom method to avoid an empty array in case of BigInteger.ZERO
      *
      * @param value - any big integer number. A <code>null</code>-value will return <code>null</code>
