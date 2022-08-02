@@ -1,8 +1,8 @@
 EVM ABI Decoder
 ============
 [![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/rvullriede/evm-client/Java%20CI%20with%20Maven)
-[![Maven Central](https://img.shields.io/maven-central/v/net.osslabz/evm-client?label=Maven%20Central)](https://search.maven.org/artifact/net.osslabz/evm-client)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/rvullriede/evm-abi-decoder/Java%20CI%20with%20Maven)
+[![Maven Central](https://img.shields.io/maven-central/v/net.osslabz/evm-abi-decoder?label=Maven%20Central)](https://search.maven.org/artifact/net.osslabz/evm-abi-decoder)
 
 EVM ABI Decoder allows to decode raw input data from EVM tx (on Ethereum or a compatible chain like Avalanche, BSC stc)
 into processable format obtained from the contract's ABi definition (JSON).
