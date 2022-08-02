@@ -1,6 +1,6 @@
 EVM ABI Decoder
 ============
-[![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+![GitHub](https://img.shields.io/github/license/rvullriede/evm-abi-decoder)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/rvullriede/evm-abi-decoder/Java%20CI%20with%20Maven)
 [![Maven Central](https://img.shields.io/maven-central/v/net.osslabz/evm-abi-decoder?label=Maven%20Central)](https://search.maven.org/artifact/net.osslabz/evm-abi-decoder)
 
@@ -12,7 +12,7 @@ This project is based on [Bryce Neals's](https://github.com/prettymuchbryce) pro
 of [ConsenSys](https://github.com/ConsenSys) project [abi-decoder](https://github.com/ConsenSys/abi-decoder) (JavaScript).
 
 The original project is written in Kotlin, only published on [JitPack](https://jitpack.io/) (but not on [Maven Central](https://search.maven.org/) and depends on the now
-deprecated [ethereumj](https://github.com/ethereum/ethereumj). These were enough reasons for me to rewrite it ;-)
+deprecated [ethereumj](https://github.com/ethereum/ethereumj). These were enough reasons for me to rewrite it in Java ;-)
 
 QuickStart
 ---------
