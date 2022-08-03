@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.osslabz.evm</groupId>
     <artifactId>evm-abi-decoder</artifactId>
-    <version>0.0.4-SNAPSHOT</version>
+    <version>0.0.4</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Allows to decode raw input data from a EVM smart contract call (on Ethereum or a compatible chain like
@@ -46,7 +45,7 @@
         <connection>scm:git:ssh://git@github.com/rvullriede/evm-abi-decoder.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/rvullriede/evm-abi-decoder.git</developerConnection>
         <url>https://github.com/rvullriede/evm-abi-decoder</url>
-        <tag>main</tag>
+        <tag>evm-abi-decoder-0.0.4</tag>
     </scm>
 
     <dependencies>
