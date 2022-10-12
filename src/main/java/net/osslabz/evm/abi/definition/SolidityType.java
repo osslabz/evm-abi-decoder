@@ -29,7 +29,6 @@ public abstract class SolidityType {
         if ("address".equals(typeName)) return new AddressType();
         if ("string".equals(typeName)) return new StringType();
         if ("bytes".equals(typeName)) return new BytesType();
-        if ("tuple".equals(typeName)) return new StringType();
         if ("function".equals(typeName)) return new FunctionType();
         if ("tuple".equals(typeName)) return new TupleType();
         if (typeName.startsWith("bytes")) return new Bytes32Type(typeName);
