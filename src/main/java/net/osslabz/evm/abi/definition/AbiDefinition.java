@@ -6,17 +6,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.util.StdConverter;
 import lombok.Data;
 import net.osslabz.evm.abi.util.ByteUtil;
 import net.osslabz.evm.abi.util.HashUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
+import org.apache.commons.lang3.StringUtils;
 
+import java.awt.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include;
 import static java.lang.String.format;
@@ -30,7 +35,18 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
     private final static ObjectMapper DEFAULT_MAPPER = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL);
-
+    public static class ParamSanitizer extends StdConverter<Entry.Param, Entry.Param> {
+        public ParamSanitizer(){}
+        @Override
+        public Entry.Param convert(Entry.Param param) {
+            if (param.type instanceof SolidityType.TupleType) {
+                for(Entry.Component c: param.components) {
+                    ((SolidityType.TupleType)param.type).types.add(c.getType());
+                }
+            }
+            return param;
+        }
+    }
     public static AbiDefinition fromJson(String json) {
         try {
             return DEFAULT_MAPPER.readValue(json, AbiDefinition.class);
@@ -123,6 +139,9 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
                 case fallback:
                     result = new Function(constant, name, inputs, outputs, payable);
                     break;
+                case receive:
+                    result = new Function(constant, name, inputs, outputs, payable);
+                    break;
                 case event:
                     result = new Event(anonymous, name, inputs, outputs);
                     break;
@@ -133,8 +152,14 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
 
         public String formatSignature() {
             StringBuilder paramsTypes = new StringBuilder();
-            for (Param param : inputs) {
-                paramsTypes.append(param.type.getCanonicalName()).append(",");
+            if (inputs != null ) {
+                for (Param param : inputs) {
+                    String type = param.type.getCanonicalName();
+                    if (param.type instanceof SolidityType.TupleType) {
+                        type = "(" + StringUtils.join(param.getComponents().stream().map(Component::getType).collect(Collectors.toList()), ",") + ")";
+                    }
+                    paramsTypes.append(type).append(",");
+                }
             }
 
             return format("%s(%s)", name, stripEnd(paramsTypes.toString(), ","));
@@ -152,15 +177,25 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
             constructor,
             function,
             event,
-            fallback
+            fallback,
+            receive
+        }
+
+        @Data
+        public static class Component {
+            private String name;
+            private SolidityType type;
         }
 
         @Data
         @JsonInclude(Include.NON_NULL)
+        @JsonDeserialize(converter= ParamSanitizer.class)  // invoked after class is fully deserialized
         public static class Param {
             private Boolean indexed;
             private String name;
             private SolidityType type;
+
+            private List<Component> components;
 
             public static List<?> decodeList(List<Param> params, byte[] encoded) {
                 List<Object> result = new ArrayList<>(params.size());

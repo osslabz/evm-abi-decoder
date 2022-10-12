@@ -65,6 +65,29 @@ public class AbiDecoderTest {
         Assertions.assertEquals(BigInteger.valueOf(1659426897), param4.getValue());
     }
 
+   @Test
+    public void testDecodeFunctionCallWithTuple() throws IOException {
+        AbiDecoder uniswapv3Abi = new AbiDecoder(this.getClass().getResource("/abiFiles/UniswapV3Router.json").getFile());
+
+        String inputData = "0x04e45aaf000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc20000000000000000000000002260fac5e5542a773aa44fbcfedf7c193bc2c59900000000000000000000000000000000000000000000000000000000000001f4000000000000000000000000bebc44782c7db0a1a60cb6fe97d0b483032ff1c70000000000000000000000000000000000000000000000000000000000067932000000000000000000000000000000000000000000000000000000000000002a0000000000000000000000000000000000000000000000000000000000000000";
+
+        DecodedFunctionCall decodedFunctionCall = uniswapv3Abi.decodeFunctionCall(inputData);
+
+        Assertions.assertEquals("exactInputSingle", decodedFunctionCall.getName());
+
+
+        DecodedFunctionCall.Param param0 = decodedFunctionCall.getParams().get(0);
+        Assertions.assertEquals("params", param0.getName());
+        Assertions.assertEquals("tuple", param0.getType());
+        Object[] v = (Object[]) param0.getValue();
+        Assertions.assertEquals("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2", v[0].toString());
+        Assertions.assertEquals("0x2260fac5e5542a773aa44fbcfedf7c193bc2c599", v[1].toString());
+        Assertions.assertEquals("500", v[2].toString());
+        Assertions.assertEquals("424242", v[4].toString());
+        Assertions.assertEquals("42", v[5].toString());
+    }
+
+
     @Test
     public void testDecodeFunctionCallUniswapV3SwapRouter02() throws IOException {
 
@@ -112,5 +135,4 @@ public class AbiDecoderTest {
             log.debug("-------------------------");
         }
     }
-
 }
