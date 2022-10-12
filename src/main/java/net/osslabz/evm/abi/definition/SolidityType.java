@@ -30,6 +30,7 @@ public abstract class SolidityType {
         if ("string".equals(typeName)) return new StringType();
         if ("bytes".equals(typeName)) return new BytesType();
         if ("function".equals(typeName)) return new FunctionType();
+        if ("tuple".equals(typeName)) return new TupleType();
         if (typeName.startsWith("bytes")) return new Bytes32Type(typeName);
         throw new RuntimeException("Unknown type: " + typeName);
     }
@@ -463,6 +464,41 @@ public abstract class SolidityType {
         @Override
         public Object decode(byte[] encoded, int offset) {
             return Boolean.valueOf(((Number) super.decode(encoded, offset)).intValue() != 0);
+        }
+    }
+
+    public static class TupleType extends SolidityType {
+
+        List<SolidityType> types = new ArrayList<>();
+        public TupleType() {
+            super("tuple");
+        }
+
+        @Override
+        public boolean isDynamicType() {
+            return false;
+        }
+
+        @Override
+        public byte[] encode(Object value) {
+            return new byte[0];
+        }
+
+        @Override
+        public Object decode(byte[] encoded, int origOffset) {
+            int offset = origOffset;
+            Object[] ret = new Object[types.size()];
+
+            for (int i = 0; i < types.size(); i++) {
+                SolidityType elementType = types.get(i);
+                if (elementType.isDynamicType()) {
+                    ret[i] = elementType.decode(encoded, origOffset + IntType.decodeInt(encoded, offset).intValue());
+                } else {
+                    ret[i] = elementType.decode(encoded, offset);
+                }
+                offset += elementType.getFixedSize();
+            }
+            return ret;
         }
     }
 
