@@ -65,7 +65,7 @@ public class AbiDecoderTest {
         Assertions.assertEquals(BigInteger.valueOf(1659426897), param4.getValue());
     }
 
-   @Test
+    @Test
     public void testDecodeFunctionCallWithTuple() throws IOException {
         AbiDecoder uniswapv3Abi = new AbiDecoder(this.getClass().getResource("/abiFiles/UniswapV3Router.json").getFile());
 
@@ -76,7 +76,7 @@ public class AbiDecoderTest {
         Assertions.assertEquals("exactInputSingle", decodedFunctionCall.getName());
 
 
-        DecodedFunctionCall.Param param0 = decodedFunctionCall.getParams().get(0);
+        DecodedFunctionCall.Param param0 = decodedFunctionCall.getParams().stream().findFirst().get();
         Assertions.assertEquals("params", param0.getName());
         Assertions.assertEquals("tuple", param0.getType());
         Object[] v = (Object[]) param0.getValue();
