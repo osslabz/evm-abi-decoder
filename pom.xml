@@ -4,7 +4,7 @@
 
     <groupId>net.osslabz.evm</groupId>
     <artifactId>evm-abi-decoder</artifactId>
-    <version>0.0.5</version>
+    <version>0.0.6-SNAPSHOT</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Allows to decode raw input data from a EVM smart contract call (on Ethereum or a compatible chain like
