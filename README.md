@@ -25,7 +25,7 @@ Maven
 <dependency>
     <groupId>net.osslabz.evm</groupId>
     <artifactId>evm-abi-decoder</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.6</version>
 </dependency>
 ```
 
