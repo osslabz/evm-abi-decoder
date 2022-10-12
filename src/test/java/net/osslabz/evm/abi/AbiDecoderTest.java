@@ -1,5 +1,6 @@
 package net.osslabz.evm.abi;
 
+import lombok.extern.slf4j.Slf4j;
 import net.osslabz.evm.abi.decoder.AbiDecoder;
 import net.osslabz.evm.abi.decoder.DecodedFunctionCall;
 import org.junit.jupiter.api.Assertions;
@@ -8,11 +9,13 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
 
+@Slf4j
 public class AbiDecoderTest {
 
     @Test
-    public void testDecodeFunctionCall() throws IOException {
+    public void testDecodeFunctionCallUniswapV2Router02() throws IOException {
 
         // Abi can be found here: https://etherscan.io/address/0x7a250d5630b4cf539739df2c5dacb4c659f2488d#code
         AbiDecoder uniswapv2Abi = new AbiDecoder(this.getClass().getResource("/abiFiles/UniswapV2Router02.json").getFile());
@@ -34,33 +37,35 @@ public class AbiDecoderTest {
 
         Assertions.assertEquals("swapExactTokensForETH", decodedFunctionCall.getName());
 
-        DecodedFunctionCall.Param param0 = decodedFunctionCall.getParams().get(0);
+        List<DecodedFunctionCall.Param> paramList = decodedFunctionCall.getParamList();
+
+        DecodedFunctionCall.Param param0 = paramList.get(0);
         Assertions.assertEquals("amountIn", param0.getName());
         Assertions.assertEquals("uint256", param0.getType());
         Assertions.assertEquals(BigInteger.valueOf(10000000), param0.getValue());
 
-        DecodedFunctionCall.Param param1 = decodedFunctionCall.getParams().get(1);
+        DecodedFunctionCall.Param param1 = paramList.get(1);
         Assertions.assertEquals("amountOutMin", param1.getName());
         Assertions.assertEquals("uint256", param1.getType());
         Assertions.assertEquals(new BigInteger("6283178947560620"), param1.getValue());
 
-        DecodedFunctionCall.Param param2 = decodedFunctionCall.getParams().get(2);
+        DecodedFunctionCall.Param param2 = paramList.get(2);
         Assertions.assertEquals("path", param2.getName());
         Assertions.assertEquals("address[]", param2.getType());
         Assertions.assertEquals(Arrays.toString(new String[]{"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"}), Arrays.toString((Object[]) param2.getValue()));
 
-        DecodedFunctionCall.Param param3 = decodedFunctionCall.getParams().get(3);
+        DecodedFunctionCall.Param param3 = paramList.get(3);
         Assertions.assertEquals("to", param3.getName());
         Assertions.assertEquals("address", param3.getType());
         Assertions.assertEquals("0xd4cf8e47beac55b42ae58991785fa326d9384bd1", param3.getValue());
 
-        DecodedFunctionCall.Param param4 = decodedFunctionCall.getParams().get(4);
+        DecodedFunctionCall.Param param4 = paramList.get(4);
         Assertions.assertEquals("deadline", param4.getName());
         Assertions.assertEquals("uint256", param4.getType());
         Assertions.assertEquals(BigInteger.valueOf(1659426897), param4.getValue());
     }
 
-    @Test
+   @Test
     public void testDecodeFunctionCallWithTuple() throws IOException {
         AbiDecoder uniswapv3Abi = new AbiDecoder(this.getClass().getResource("/abiFiles/UniswapV3Router.json").getFile());
 
@@ -82,4 +87,52 @@ public class AbiDecoderTest {
         Assertions.assertEquals("42", v[5].toString());
     }
 
+
+    @Test
+    public void testDecodeFunctionCallUniswapV3SwapRouter02() throws IOException {
+
+
+        AbiDecoder uniswapv3SwapRouter02Abi = new AbiDecoder(this.getClass().getResource("/abiFiles/UniswapV3SwapRouter02.json").getFile());
+
+        // https://etherscan.io/tx/0x731847de5b19b26039f283826ae5218ac7e070ed1b7fff689c2253a3035d8bd6
+        String inputData = "0x5ae401dc0000000000000000000000000000000000000000000000000000000062ed6b0d000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000016000000000000000000000000000000000000000000000000000000000000000e4472b43f3000000000000000000000000000000000000000000000000000008c75ee6fb3900000000000000000000000000000000000000000000000001cb1a1493ed3d4b0000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000020000000000000000000000009bbe10ba8ad02c2a54963b3e2a64f1754c90f411000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004449404b7c00000000000000000000000000000000000000000000000001cb1a1493ed3d4b000000000000000000000000c0da58d88e967d883ef0540db458381e9f5e9c8000000000000000000000000000000000000000000000000000000000";
+        List<DecodedFunctionCall> decodedFunctionCalls = uniswapv3SwapRouter02Abi.decodeFunctionsCalls(inputData);
+
+
+        int i = 0;
+        for (DecodedFunctionCall func : decodedFunctionCalls) {
+            log.debug("{}: function: {}", i, func.getName());
+            int p = 0;
+            for (DecodedFunctionCall.Param param : func.getParams()) {
+                log.debug("param {}: name={}, type={}, value={}", p, param.getName(), param.getType(), param.getValue());
+                p++;
+            }
+            i++;
+            log.debug("-------------------------");
+        }
+    }
+
+    @Test
+    public void testDecodeFunctionCallUniswapV3SwapRouter02Swap() throws IOException {
+
+
+        AbiDecoder uniswapv3SwapRouter02Abi = new AbiDecoder(this.getClass().getResource("/abiFiles/UniswapV3SwapRouter02.json").getFile());
+
+        // https://etherscan.io/tx/0xb8ea1e889a4b7bfd1a51359801645518e2f648522c6662c4dd2939a5d9fe6ff4
+        String inputData = "0x5ae401dc0000000000000000000000000000000000000000000000000000000062fba2e2000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000016000000000000000000000000000000000000000000000000000000000000000e4472b43f3000000000000000000000000000000000000000003a5efc474214c296d933ea100000000000000000000000000000000000000000000000000d5b866fcc68674000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000002000000000000000000000000d041e4427412ede81ccac87f08fa3490af61033d000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004449404b7c00000000000000000000000000000000000000000000000000d5b866fcc68674000000000000000000000000caed7876d89f4f67808e0301a1dfb218d73f569000000000000000000000000000000000000000000000000000000000";
+        List<DecodedFunctionCall> decodedFunctionCalls = uniswapv3SwapRouter02Abi.decodeFunctionsCalls(inputData);
+
+
+        int i = 0;
+        for (DecodedFunctionCall func : decodedFunctionCalls) {
+            log.debug("{}: function: {}", i, func.getName());
+            int p = 0;
+            for (DecodedFunctionCall.Param param : func.getParams()) {
+                log.debug("param {}: name={}, type={}, value={}", p, param.getName(), param.getType(), param.getValue());
+                p++;
+            }
+            i++;
+            log.debug("-------------------------");
+        }
+    }
 }

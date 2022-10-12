@@ -17,6 +17,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,6 +50,22 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
     public static AbiDefinition fromJson(String json) {
         try {
             return DEFAULT_MAPPER.readValue(json, AbiDefinition.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static AbiDefinition fromJson(Reader reader) {
+        try {
+            return DEFAULT_MAPPER.readValue(reader, AbiDefinition.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static AbiDefinition fromJson(InputStream inputStream) {
+        try {
+            return DEFAULT_MAPPER.readValue(inputStream, AbiDefinition.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
