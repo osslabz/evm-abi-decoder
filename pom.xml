@@ -22,7 +22,7 @@
         <project.build.sourceEncoding>${project.defaultEncoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${project.defaultEncoding}</project.reporting.outputEncoding>
 
-        <jackson.version>2.13.4</jackson.version>
+        <jackson.version>2.14.1</jackson.version>
     </properties>
 
     <licenses>
