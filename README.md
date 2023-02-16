@@ -11,7 +11,7 @@ into processable format obtained from the contract's ABi definition (JSON).
 This project is based on [Bryce Neals's](https://github.com/prettymuchbryce) project [abidecoder](https://github.com/prettymuchbryce/abidecoder) (Kotlin), which itself is a port
 of [ConsenSys](https://github.com/ConsenSys) project [abi-decoder](https://github.com/ConsenSys/abi-decoder) (JavaScript).
 
-The original project is written in Kotlin, only published on [JitPack](https://jitpack.io/) (but not on [Maven Central](https://search.maven.org/) and depends on the now
+The original project is written in Kotlin, only published on [JitPack](https://jitpack.io/) (but not on [Maven Central](https://search.maven.org/)) and depends on the now
 deprecated [ethereumj](https://github.com/ethereum/ethereumj). These were enough reasons for me to rewrite it in Java ;-)
 
 QuickStart
