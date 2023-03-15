@@ -470,6 +470,7 @@ public abstract class SolidityType {
     public static class TupleType extends SolidityType {
 
         List<SolidityType> types = new ArrayList<>();
+
         public TupleType() {
             super("tuple");
         }

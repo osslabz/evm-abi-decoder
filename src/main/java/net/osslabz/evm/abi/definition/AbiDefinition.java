@@ -34,18 +34,22 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
     private final static ObjectMapper DEFAULT_MAPPER = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL);
+
     public static class ParamSanitizer extends StdConverter<Entry.Param, Entry.Param> {
-        public ParamSanitizer(){}
+        public ParamSanitizer() {
+        }
+
         @Override
         public Entry.Param convert(Entry.Param param) {
             if (param.type instanceof SolidityType.TupleType) {
-                for(Entry.Component c: param.components) {
-                    ((SolidityType.TupleType)param.type).types.add(c.getType());
+                for (Entry.Component c : param.components) {
+                    ((SolidityType.TupleType) param.type).types.add(c.getType());
                 }
             }
             return param;
         }
     }
+
     public static AbiDefinition fromJson(String json) {
         try {
             return DEFAULT_MAPPER.readValue(json, AbiDefinition.class);
@@ -151,7 +155,7 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
 
         public String formatSignature() {
             StringBuilder paramsTypes = new StringBuilder();
-            if (inputs != null ) {
+            if (inputs != null) {
                 for (Param param : inputs) {
                     String type = param.type.getCanonicalName();
                     if (param.type instanceof SolidityType.TupleType) {
@@ -188,7 +192,7 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
 
         @Data
         @JsonInclude(Include.NON_NULL)
-        @JsonDeserialize(converter= ParamSanitizer.class)  // invoked after class is fully deserialized
+        @JsonDeserialize(converter = ParamSanitizer.class)  // invoked after class is fully deserialized
         public static class Param {
             private Boolean indexed;
             private String name;

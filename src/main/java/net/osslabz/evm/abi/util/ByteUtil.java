@@ -32,8 +32,7 @@ public class ByteUtil {
      *
      * @param data - byte-array to convert to a hex-string
      * @return hex representation of the data.<br>
-     *      Returns an empty String if the input is <code>null</code>
-     *
+     * Returns an empty String if the input is <code>null</code>
      * @see Hex#toHexString
      */
     public static String toHexString(byte[] data) {
@@ -53,7 +52,7 @@ public class ByteUtil {
      *
      * @param value - any big integer number. A <code>null</code>-value will return <code>null</code>
      * @return A byte array without a leading zero byte if present in the signed encoding.
-     *      BigInteger.ZERO will return an array with length 1 and byte-value 0.
+     * BigInteger.ZERO will return an array with length 1 and byte-value 0.
      */
     public static byte[] bigIntegerToBytes(BigInteger value) {
         if (value == null)
@@ -73,7 +72,7 @@ public class ByteUtil {
      * The regular {@link java.math.BigInteger#toByteArray()} method isn't quite what we often need:
      * it appends a leading zero to indicate that the number is positive and may need padding.
      *
-     * @param b the integer to format into a byte array
+     * @param b        the integer to format into a byte array
      * @param numBytes the desired size of the resulting byte array
      * @return numBytes byte long array.
      */
@@ -100,7 +99,6 @@ public class ByteUtil {
         System.arraycopy(biBytes, start, bytes, numBytes - length, length);
         return bytes;
     }
-
 
 
     /**
