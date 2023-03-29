@@ -4,8 +4,8 @@ EVM ABI Decoder
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/rvullriede/evm-abi-decoder/maven.yml?branch=main)
 [![Maven Central](https://img.shields.io/maven-central/v/net.osslabz.evm/evm-abi-decoder?label=Maven%20Central)](https://search.maven.org/artifact/net.osslabz.evm/evm-abi-decoder)
 
-EVM ABI Decoder allows to decode raw input data from EVM tx (on Ethereum or a compatible chain like Avalanche, BSC stc)
-into processable format obtained from the contract's ABi definition (JSON).
+EVM ABI Decoder allows to decode raw input data from a EVM transaction (on Ethereum or a compatible chain like Avalanche, BSC etc.)
+into a processable format obtained from the contract's ABi definition (JSON).
 
 **Acknowledgement**:
 This project is based on [Bryce Neals's](https://github.com/prettymuchbryce) project [abidecoder](https://github.com/prettymuchbryce/abidecoder) (Kotlin), which itself is a port
