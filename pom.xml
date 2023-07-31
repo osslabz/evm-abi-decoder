@@ -5,7 +5,7 @@
 
     <groupId>net.osslabz</groupId>
     <artifactId>evm-abi-decoder</artifactId>
-    <version>0.0.8</version>
+    <version>0.0.8-SNAPSHOT</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Allows to decode raw input data from an EVM smart contract call (on Ethereum or a compatible chain like
@@ -165,6 +165,17 @@
                                 </goals>
                             </execution>
                         </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>3.0.1</version>
+                        <configuration>
+                            <autoVersionSubmodules>true</autoVersionSubmodules>
+                            <useReleaseProfile>false</useReleaseProfile>
+                            <releaseProfiles>release</releaseProfiles>
+                            <goals>deploy</goals>
+                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
