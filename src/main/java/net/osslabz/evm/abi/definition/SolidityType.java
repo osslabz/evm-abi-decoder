@@ -477,11 +477,7 @@ public abstract class SolidityType {
 
         @Override
         public boolean isDynamicType() {
-            return containsDynamicTypes();
-        }
-
-        private boolean containsDynamicTypes(){
-            return types.stream().anyMatch(SolidityType::isDynamicType);
+            return false;
         }
 
         @Override
