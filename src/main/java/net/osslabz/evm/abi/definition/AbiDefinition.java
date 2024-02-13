@@ -94,6 +94,10 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
         return find(Event.class, Entry.Type.event, searchPredicate);
     }
 
+    public Error findError(Predicate<Error> searchError) {
+        return find(Error.class, Entry.Type.error, searchError);
+    }
+
     public Constructor findConstructor() {
         return find(Constructor.class, Entry.Type.constructor, object -> true);
     }
@@ -148,6 +152,9 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
                 case event:
                     result = new Event(anonymous, name, inputs, outputs);
                     break;
+                case error:
+                    result = new Error(name, inputs);
+                    break;
             }
 
             return result;
@@ -181,7 +188,8 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
             function,
             event,
             fallback,
-            receive
+            receive,
+            error
         }
 
         @Data
@@ -356,6 +364,21 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
         @Override
         public String toString() {
             return format("event %s(%s);", name, join(inputs, ", "));
+        }
+    }
+
+    public static class Error extends Entry {
+        public Error(String name, List<Param> inputs) {
+            super(null, null, name, inputs, null, Type.error, false);
+        }
+
+        public List<?> decode(byte[] encoded) {
+            return Param.decodeList(inputs, encoded);
+        }
+
+        @Override
+        public String toString() {
+            return format("error %s(%s);", name, join(inputs, ", "));
         }
     }
 }
