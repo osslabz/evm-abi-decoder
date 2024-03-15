@@ -15,7 +15,7 @@
 
     <properties>
         <osslabz.encoding>UTF-8</osslabz.encoding>
-        <osslabz.java.version>17</osslabz.java.version>
+        <osslabz.java.version>8</osslabz.java.version>
 
         <project.build.sourceEncoding>${osslabz.encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${osslabz.encoding}</project.reporting.outputEncoding>
