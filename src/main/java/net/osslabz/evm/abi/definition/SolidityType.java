@@ -2,6 +2,7 @@ package net.osslabz.evm.abi.definition;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
 import net.osslabz.evm.abi.util.ByteUtil;
 
 import java.lang.reflect.Array;
@@ -12,8 +13,13 @@ import java.util.Arrays;
 import java.util.List;
 
 
+@Getter
 public abstract class SolidityType {
     private final static int Int32Size = 32;
+    /**
+     * -- GETTER --
+     *  The type name as it was specified in the interface description
+     */
     protected String name;
 
     public SolidityType(String name) {
@@ -33,13 +39,6 @@ public abstract class SolidityType {
         if ("tuple".equals(typeName)) return new TupleType();
         if (typeName.startsWith("bytes")) return new Bytes32Type(typeName);
         throw new RuntimeException("Unknown type: " + typeName);
-    }
-
-    /**
-     * The type name as it was specified in the interface description
-     */
-    public String getName() {
-        return name;
     }
 
     /**
@@ -82,6 +81,7 @@ public abstract class SolidityType {
     }
 
 
+    @Getter
     public static abstract class ArrayType extends SolidityType {
         SolidityType elementType;
 
@@ -108,14 +108,14 @@ public abstract class SolidityType {
                     elems.add(Array.get(value, i));
                 }
                 return encodeList(elems);
-            } else if (value instanceof List) {
-                return encodeList((List) value);
+            } else if (value instanceof List<?>) {
+                return encodeList((List<?>) value);
             } else {
                 throw new RuntimeException("List value expected for type " + getName());
             }
         }
 
-        protected byte[] encodeTuple(List l) {
+        protected byte[] encodeTuple(List<?> l) {
             byte[][] elems;
             if (elementType.isDynamicType()) {
                 elems = new byte[l.size() * 2][];
@@ -151,11 +151,7 @@ public abstract class SolidityType {
         }
 
 
-        public SolidityType getElementType() {
-            return elementType;
-        }
-
-        public abstract byte[] encodeList(List l);
+        public abstract byte[] encodeList(List<?> l);
     }
 
     public static class StaticArrayType extends ArrayType {
@@ -175,7 +171,7 @@ public abstract class SolidityType {
         }
 
         @Override
-        public byte[] encodeList(List l) {
+        public byte[] encodeList(List<?> l) {
             if (l.size() != size)
                 throw new RuntimeException("List size (" + l.size() + ") != " + size + " for type " + getName());
             return encodeTuple(l);
@@ -212,7 +208,7 @@ public abstract class SolidityType {
         }
 
         @Override
-        public byte[] encodeList(List l) {
+        public byte[] encodeList(List<?> l) {
             return ByteUtil.merge(IntType.encodeInt(l.size()), encodeTuple(l));
         }
 
@@ -303,8 +299,7 @@ public abstract class SolidityType {
                 byte[] bytes = ((String) value).getBytes(StandardCharsets.UTF_8);
                 System.arraycopy(bytes, 0, ret, 0, bytes.length);
                 return ret;
-            } else if (value instanceof byte[]) {
-                byte[] bytes = (byte[]) value;
+            } else if (value instanceof byte[] bytes) {
                 byte[] ret = new byte[Int32Size];
                 System.arraycopy(bytes, 0, ret, Int32Size - bytes.length, bytes.length);
                 return ret;
@@ -463,13 +458,14 @@ public abstract class SolidityType {
 
         @Override
         public Object decode(byte[] encoded, int offset) {
-            return Boolean.valueOf(((Number) super.decode(encoded, offset)).intValue() != 0);
+            return ((Number) super.decode(encoded, offset)).intValue() != 0;
         }
     }
 
+    @Getter
     public static class TupleType extends SolidityType {
 
-        List<SolidityType> types = new ArrayList<>();
+        private final List<SolidityType> types = new ArrayList<>();
 
         public TupleType() {
             super("tuple");
@@ -478,6 +474,15 @@ public abstract class SolidityType {
         @Override
         public boolean isDynamicType() {
             return containsDynamicTypes();
+        }
+
+        @Override
+        public int getFixedSize() {
+            if (isDynamicType()) {
+                return super.getFixedSize();
+            } else {
+                return types.stream().mapToInt(SolidityType::getFixedSize).sum();
+            }
         }
 
         private boolean containsDynamicTypes(){

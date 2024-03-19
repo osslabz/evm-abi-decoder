@@ -1,5 +1,6 @@
 package net.osslabz.evm.abi.decoder;
 
+import lombok.Getter;
 import net.osslabz.evm.abi.definition.AbiDefinition;
 import org.bouncycastle.util.encoders.Hex;
 
@@ -7,17 +8,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+@Getter
 public class AbiDecoder {
 
-    private final AbiDefinition abi;
-
-    Map<String, AbiDefinition.Entry> methodSignatures = new HashMap<>();
+    protected final AbiDefinition abi;
+    protected final Map<String, AbiDefinition.Entry> methodSignatures = new HashMap<>();
 
     public AbiDecoder(String abiFilePath) throws IOException {
         this.abi = AbiDefinition.fromJson(Files.readString(Path.of(abiFilePath)));
@@ -36,12 +33,11 @@ public class AbiDecoder {
         }
     }
 
-
     public DecodedFunctionCall decodeFunctionCall(String inputData) {
         if (inputData == null || (inputData.startsWith("0x") && inputData.length() < 10) || inputData.length() < 8) {
             throw new IllegalArgumentException("Can't decode invalid input '" + inputData + "'.");
         }
-        String inputNoPrefix = inputData.startsWith("0x") ? inputData.substring(2) : inputData;
+        String inputNoPrefix = cleanup(inputData);
 
         String methodBytes = inputNoPrefix.substring(0, 8);
 
@@ -51,11 +47,9 @@ public class AbiDecoder {
         }
         AbiDefinition.Entry abiEntry = this.methodSignatures.get(methodBytes);
 
-        if (!(abiEntry instanceof AbiDefinition.Function)) {
+        if (!(abiEntry instanceof AbiDefinition.Function abiFunction)) {
             throw new IllegalArgumentException("Input data is not a function call, it's of type '" + abiEntry.type + "'.");
         }
-
-        AbiDefinition.Function abiFunction = (AbiDefinition.Function) abiEntry;
 
         List<DecodedFunctionCall.Param> params = new ArrayList<>(abiFunction.inputs.size());
         List<?> decoded = abiFunction.decode(Hex.decode(inputNoPrefix));
@@ -110,5 +104,41 @@ public class AbiDecoder {
             }
         }
         return resolvedCalls;
+    }
+
+    public DecodedFunctionCall decodeLogEvent(List<String> topics, String data) {
+        if (topics.isEmpty()) {
+            throw new IllegalArgumentException("Log.topics is empty");
+        }
+        String funcSignature = cleanup(topics.get(0));
+        AbiDefinition.Entry abiEntry = methodSignatures.get(funcSignature);
+        if (abiEntry == null) {
+            throw new IllegalStateException("Couldn't find method with signature " + funcSignature);
+        } else {
+            if (abiEntry instanceof AbiDefinition.Event abiEvent) {
+                List<?> decoded = abiEvent.decode(hexBytes(data), topics
+                        .stream()
+                        .map(AbiDecoder::hexBytes)
+                        .toArray(byte[][]::new));
+                List<DecodedFunctionCall.Param> params = new ArrayList<>(abiEvent.inputs.size());
+                for (int i = 0; i < decoded.size(); i++) {
+                    AbiDefinition.Entry.Param paramDefinition = abiEvent.inputs.get(i);
+                    DecodedFunctionCall.Param param = new DecodedFunctionCall.Param(paramDefinition.getName(), paramDefinition.getType()
+                            .getName(), decoded.get(i));
+                    params.add(param);
+                }
+                return new DecodedFunctionCall(abiEvent.name, params);
+            } else {
+                throw new IllegalArgumentException("Input data is not a event, it's of type '" + abiEntry.type + "'.");
+            }
+        }
+    }
+
+    private static String cleanup(String hex) {
+        return hex.startsWith("0x") ? hex.substring(2) : hex;
+    }
+
+    private static byte[] hexBytes(String hex) {
+        return Hex.decode(cleanup(hex));
     }
 }
