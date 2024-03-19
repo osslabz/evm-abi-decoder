@@ -213,6 +213,45 @@ public class AbiDecoderTest {
     }
 
     @Test
+    public void testTupleParamsSignature() {
+        String funcName = "exactInput";
+        AbiDecoder decoder = new AbiDecoder(this.getClass()
+                .getClassLoader()
+                .getResourceAsStream("abiFiles/UniswapV3Router.json"));
+        AbiDefinition.Entry func = decoder.getAbi()
+                .stream()
+                .filter(e -> funcName.equals(e.name))
+                .findAny()
+                .orElse(null);
+        Assertions.assertNotNull(func);
+        Assertions.assertEquals("exactInput((bytes,address,uint256,uint256,uint256))", func.formatSignature());
+        Assertions.assertEquals("c04b8d59", Hex.toHexString(func.encodeSignature()));
+    }
+
+    @Test
+    public void testUniswapV3Router() throws URISyntaxException, IOException {
+        String funcName = "exactInput";
+        AbiDecoder decoder = new AbiDecoder(this.getClass()
+                .getClassLoader()
+                .getResourceAsStream("abiFiles/UniswapV3Router.json"));
+        DecodedFunctionCall decode = decoder.decodeFunctionCall(FileUtil.read("abiFiles/uniswapV3Router-input/input_0xeb154fb38972106bfc0e9bce28130379c44d80be292de775e0f43e2c861e0f48"));
+        Assertions.assertNotNull(decode);
+        Assertions.assertEquals(funcName, decode.getName());
+        Assertions.assertEquals(1, decode.getParams().size());
+        DecodedFunctionCall.Param param = decode.getParams().stream().findFirst().orElse(null);
+        Assertions.assertNotNull(param);
+        Object[] value = Assertions.assertInstanceOf(Object[].class, param.getValue());
+        Assertions.assertEquals(5, value.length);
+        Assertions.assertArrayEquals(new Object[]{
+                "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000bb8514910771af9ca656af840dff83e8264ecf986ca000bb8dac17f958d2ee523a2206206994597c13d831ec7",
+                "0x9e3df1cd92386519734558178e535e0460b10ab6",
+                new BigInteger("1692606069"),
+                new BigInteger("500000000000000"),
+                new BigInteger("843698")
+        }, value);
+    }
+
+    @Test
     public void testUSDTTransferLog() {
         AbiDecoder decoder = new AbiDecoder(this.getClass()
                 .getClassLoader()
@@ -238,6 +277,5 @@ public class AbiDecoderTest {
                         "0x000000000000000000000000a5ece9bab9a0e56ad63ad0734033c944eeb00e1a",
                         "0x0000000000000000000000000000000000000000000000000000000000000000"),
                 "0x0000000000000000000000000000000000000000000000000020affce72f5800"));
-
     }
 }
