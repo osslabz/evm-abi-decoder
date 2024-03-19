@@ -13,6 +13,7 @@ import java.util.Map;
 
 @Data
 public class DecodedFunctionCall {
+
     private String name;
     private Map<String, Param> params;
 
@@ -26,6 +27,10 @@ public class DecodedFunctionCall {
 
     public Param getParam(String paramName) {
         return this.params.get(paramName.toLowerCase());
+    }
+
+    public Map<String, Param> params() {
+        return this.params;
     }
 
     public Collection<Param> getParams() {
@@ -52,8 +57,7 @@ public class DecodedFunctionCall {
             this.type = type;
             if (value instanceof byte[]) {
                 this.value = "0x" + ByteUtil.toHexString((byte[]) value);
-            } else if (value instanceof Object[]) {
-                Object[] valueAsObjectArray = (Object[]) value;
+            } else if (value instanceof Object[] valueAsObjectArray) {
                 this.value = new Object[valueAsObjectArray.length];
                 for (int i = 0; i < valueAsObjectArray.length; i++) {
                     Object o = valueAsObjectArray[i];
