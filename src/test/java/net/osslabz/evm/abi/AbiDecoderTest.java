@@ -3,12 +3,16 @@ package net.osslabz.evm.abi;
 import lombok.extern.slf4j.Slf4j;
 import net.osslabz.evm.abi.decoder.AbiDecoder;
 import net.osslabz.evm.abi.decoder.DecodedFunctionCall;
+import net.osslabz.evm.abi.definition.AbiDefinition;
+import net.osslabz.evm.abi.util.FileUtil;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -161,5 +165,117 @@ public class AbiDecoderTest {
             i++;
             log.debug("-------------------------");
         }
+    }
+
+    @Test
+    public void testTupleArrayParamsSignature() {
+        String funcName = "commitBlocks";
+        AbiDecoder decoder = new AbiDecoder(this.getClass()
+                .getClassLoader()
+                .getResourceAsStream("abiFiles/ZkSync.json"));
+        AbiDefinition.Entry func = decoder.getAbi()
+                .stream()
+                .filter(e -> funcName.equals(e.name))
+                .findAny()
+                .orElse(null);
+        Assertions.assertNotNull(func);
+        Assertions.assertEquals("commitBlocks((uint32,uint64,bytes32,uint256,bytes32,bytes32),(bytes32,bytes,uint256,(bytes,uint32)[],uint32,uint32)[])", func.formatSignature());
+        Assertions.assertEquals("45269298", Hex.toHexString(func.encodeSignature()));
+    }
+
+    @Test
+    public void testTupleArrayParamsDecode() throws URISyntaxException, IOException {
+        String funcName = "commitBlocks";
+        AbiDecoder decoder = new AbiDecoder(this.getClass()
+                .getClassLoader()
+                .getResourceAsStream("abiFiles/ZkSync.json"));
+        DecodedFunctionCall decode = decoder.decodeFunctionCall(FileUtil.readFileIntoString("abiFiles/zkSync-input/input_0xe35a7dceb1536dfbd819ab6f756e4dcb19ea09541df54abf0f40064ba1163981"));
+        Assertions.assertNotNull(decode);
+        Assertions.assertEquals(funcName, decode.getName());
+        Assertions.assertEquals(2, decode.getParams().size());
+        for (DecodedFunctionCall.Param param : decode.getParams()) {
+            if ("_lastCommittedBlockData".equals(param.getName())) {
+                Object[] value = Assertions.assertInstanceOf(Object[].class, param.getValue());
+                Assertions.assertEquals(6, value.length);
+                Assertions.assertArrayEquals(new Object[]{
+                        new BigInteger("432775"),
+                        new BigInteger("0"),
+                        "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
+                        new BigInteger("1710501302"),
+                        "0x071035b8b917294d5b81ae4c5124ecc2e4d5782c50cb9cfc7d037f7f8af7d791",
+                        "0x316e6378abf242e3494c50d6afc3e929d9be0ad9cfdc5ebaa34ae7b8456dd3f6"
+                }, value);
+            } else if ("_newBlocksData".equals(param.getName())) {
+                Object[] value = Assertions.assertInstanceOf(Object[].class, param.getValue());
+                Assertions.assertEquals(10, value.length);
+            }
+        }
+    }
+
+    @Test
+    public void testTupleParamsSignature() {
+        String funcName = "exactInput";
+        AbiDecoder decoder = new AbiDecoder(this.getClass()
+                .getClassLoader()
+                .getResourceAsStream("abiFiles/UniswapV3Router.json"));
+        AbiDefinition.Entry func = decoder.getAbi()
+                .stream()
+                .filter(e -> funcName.equals(e.name))
+                .findAny()
+                .orElse(null);
+        Assertions.assertNotNull(func);
+        Assertions.assertEquals("exactInput((bytes,address,uint256,uint256,uint256))", func.formatSignature());
+        Assertions.assertEquals("c04b8d59", Hex.toHexString(func.encodeSignature()));
+    }
+
+    @Test
+    public void testUniswapV3Router() throws URISyntaxException, IOException {
+        String funcName = "exactInput";
+        AbiDecoder decoder = new AbiDecoder(this.getClass()
+                .getClassLoader()
+                .getResourceAsStream("abiFiles/UniswapV3Router.json"));
+        DecodedFunctionCall decode = decoder.decodeFunctionCall(FileUtil.readFileIntoString("abiFiles/uniswapV3Router-input/input_0xeb154fb38972106bfc0e9bce28130379c44d80be292de775e0f43e2c861e0f48"));
+        Assertions.assertNotNull(decode);
+        Assertions.assertEquals(funcName, decode.getName());
+        Assertions.assertEquals(1, decode.getParams().size());
+        DecodedFunctionCall.Param param = decode.getParams().stream().findFirst().orElse(null);
+        Assertions.assertNotNull(param);
+        Object[] value = Assertions.assertInstanceOf(Object[].class, param.getValue());
+        Assertions.assertEquals(5, value.length);
+        Assertions.assertArrayEquals(new Object[]{
+                "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000bb8514910771af9ca656af840dff83e8264ecf986ca000bb8dac17f958d2ee523a2206206994597c13d831ec7",
+                "0x9e3df1cd92386519734558178e535e0460b10ab6",
+                new BigInteger("1692606069"),
+                new BigInteger("500000000000000"),
+                new BigInteger("843698")
+        }, value);
+    }
+
+    @Test
+    public void testUSDTTransferLog() {
+        AbiDecoder decoder = new AbiDecoder(this.getClass()
+                .getClassLoader()
+                .getResourceAsStream("abiFiles/TetherToken.json"));
+        DecodedFunctionCall log = decoder.decodeLogEvent(Arrays.asList(
+                        "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                        "0x000000000000000000000000abea9132b05a70803a4e85094fd0e1800777fbef",
+                        "0x00000000000000000000000047c27dea4d3625169a3dcad8c1fc4375e1c0a8fc"),
+                "0x000000000000000000000000000000000000000000000000000000000edc4c64");
+        Assertions.assertEquals("Transfer", log.getName());
+        Assertions.assertEquals(3, log.getParams().size());
+        Assertions.assertEquals("0xabea9132b05a70803a4e85094fd0e1800777fbef", log.params().get("from").getValue());
+        Assertions.assertEquals("0x47c27dea4d3625169a3dcad8c1fc4375e1c0a8fc", log.params().get("to").getValue());
+        Assertions.assertEquals(BigInteger.valueOf(249318500), log.params().get("value").getValue());
+    }
+
+    @Test
+    public void testLogWrongInput() {
+        AbiDecoder decoder = new AbiDecoder(this.getClass()
+                .getClassLoader()
+                .getResourceAsStream("abiFiles/TetherToken.json"));
+        Assertions.assertThrows(IllegalStateException.class, () -> decoder.decodeLogEvent(Arrays.asList("0xefef619ae4a542a2b8810b4efeccd8478bd683e985354ee31dd2d644aff6d0ca",
+                        "0x000000000000000000000000a5ece9bab9a0e56ad63ad0734033c944eeb00e1a",
+                        "0x0000000000000000000000000000000000000000000000000000000000000000"),
+                "0x0000000000000000000000000000000000000000000000000020affce72f5800"));
     }
 }

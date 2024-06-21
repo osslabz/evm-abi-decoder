@@ -2,6 +2,7 @@ package net.osslabz.evm.abi.definition;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import lombok.Getter;
 import net.osslabz.evm.abi.util.ByteUtil;
 
 import java.lang.reflect.Array;
@@ -14,6 +15,10 @@ import java.util.List;
 
 public abstract class SolidityType {
     private final static int Int32Size = 32;
+    /**
+     * -- GETTER --
+     *  The type name as it was specified in the interface description
+     */
     protected String name;
 
     public SolidityType(String name) {
@@ -463,13 +468,14 @@ public abstract class SolidityType {
 
         @Override
         public Object decode(byte[] encoded, int offset) {
-            return Boolean.valueOf(((Number) super.decode(encoded, offset)).intValue() != 0);
+            return ((Number) super.decode(encoded, offset)).intValue() != 0;
         }
     }
 
+    @Getter
     public static class TupleType extends SolidityType {
 
-        List<SolidityType> types = new ArrayList<>();
+        private final List<SolidityType> types = new ArrayList<>();
 
         public TupleType() {
             super("tuple");
@@ -478,6 +484,15 @@ public abstract class SolidityType {
         @Override
         public boolean isDynamicType() {
             return containsDynamicTypes();
+        }
+
+        @Override
+        public int getFixedSize() {
+            if (isDynamicType()) {
+                return super.getFixedSize();
+            } else {
+                return types.stream().mapToInt(SolidityType::getFixedSize).sum();
+            }
         }
 
         private boolean containsDynamicTypes(){

@@ -13,6 +13,7 @@ import java.util.Map;
 
 @Data
 public class DecodedFunctionCall {
+
     private String name;
     private Map<String, Param> params;
 
@@ -26,6 +27,10 @@ public class DecodedFunctionCall {
 
     public Param getParam(String paramName) {
         return this.params.get(paramName.toLowerCase());
+    }
+
+    public Map<String, Param> params() {
+        return this.params;
     }
 
     public Collection<Param> getParams() {

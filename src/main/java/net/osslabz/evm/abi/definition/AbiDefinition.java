@@ -42,8 +42,15 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
         @Override
         public Entry.Param convert(Entry.Param param) {
             if (param.type instanceof SolidityType.TupleType) {
-                for (Entry.Component c : param.components) {
-                    ((SolidityType.TupleType) param.type).types.add(c.getType());
+                for (Entry.Param c : param.components) {
+                    ((SolidityType.TupleType) param.type).getTypes().add(c.getType());
+                }
+            } else if (param.type instanceof SolidityType.ArrayType) {
+                SolidityType.ArrayType arrayType = (SolidityType.ArrayType) param.type;
+                if (arrayType.elementType instanceof SolidityType.TupleType) {
+                    for (AbiDefinition.Entry.Param c : param.components) {
+                        ((SolidityType.TupleType) arrayType.elementType).getTypes().add(c.getType());
+                    }
                 }
             }
             return param;
@@ -164,15 +171,22 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
             StringBuilder paramsTypes = new StringBuilder();
             if (inputs != null) {
                 for (Param param : inputs) {
-                    String type = param.type.getCanonicalName();
-                    if (param.type instanceof SolidityType.TupleType) {
-                        type = "(" + StringUtils.join(param.getComponents().stream().map(Component::getType).collect(Collectors.toList()), ",") + ")";
-                    }
+                    String type = formatParamSignature(param);
                     paramsTypes.append(type).append(",");
                 }
             }
 
             return format("%s(%s)", name, stripEnd(paramsTypes.toString(), ","));
+        }
+
+        public String formatParamSignature(Param param) {
+            String type = param.type.getCanonicalName();
+            if (param.type instanceof SolidityType.TupleType) {
+                type = "(" + StringUtils.join(param.getComponents().stream().map(this::formatParamSignature).collect(Collectors.toList()), ",") + ")";
+            } else if (param.type instanceof SolidityType.ArrayType && ((SolidityType.ArrayType)param.type).elementType instanceof SolidityType.TupleType) {
+                type = "(" + StringUtils.join(param.getComponents().stream().map(this::formatParamSignature).collect(Collectors.toList()), ",") + ")[]";
+            }
+            return type;
         }
 
         public byte[] fingerprintSignature() {
@@ -193,12 +207,6 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
         }
 
         @Data
-        public static class Component {
-            private String name;
-            private SolidityType type;
-        }
-
-        @Data
         @JsonInclude(Include.NON_NULL)
         @JsonDeserialize(converter = ParamSanitizer.class)  // invoked after class is fully deserialized
         public static class Param {
@@ -206,7 +214,7 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
             private String name;
             private SolidityType type;
 
-            private List<Component> components;
+            private List<Param> components;
 
             public static List<?> decodeList(List<Param> params, byte[] encoded) {
                 List<Object> result = new ArrayList<>(params.size());
