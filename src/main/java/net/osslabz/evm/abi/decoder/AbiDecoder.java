@@ -6,9 +6,15 @@ import org.bouncycastle.util.encoders.Hex;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Getter
 public class AbiDecoder {
@@ -17,7 +23,7 @@ public class AbiDecoder {
     protected final Map<String, AbiDefinition.Entry> methodSignatures = new HashMap<>();
 
     public AbiDecoder(String abiFilePath) throws IOException {
-        this.abi = AbiDefinition.fromJson(Files.readString(Path.of(abiFilePath)));
+        this.abi = AbiDefinition.fromJson(new String(Files.readAllBytes(Paths.get(abiFilePath)), StandardCharsets.UTF_8));
         init();
     }
 
@@ -105,6 +111,7 @@ public class AbiDecoder {
         }
         return resolvedCalls;
     }
+
 
     public DecodedFunctionCall decodeLogEvent(List<String> topics, String data) {
         if (topics.isEmpty()) {
