@@ -57,7 +57,8 @@ public class DecodedFunctionCall {
             this.type = type;
             if (value instanceof byte[]) {
                 this.value = "0x" + ByteUtil.toHexString((byte[]) value);
-            } else if (value instanceof Object[] valueAsObjectArray) {
+            } else if (value instanceof Object[]) {
+                Object[] valueAsObjectArray = (Object[]) value;
                 this.value = new Object[valueAsObjectArray.length];
                 for (int i = 0; i < valueAsObjectArray.length; i++) {
                     Object o = valueAsObjectArray[i];

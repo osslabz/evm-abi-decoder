@@ -189,7 +189,7 @@ public class AbiDecoderTest {
         AbiDecoder decoder = new AbiDecoder(this.getClass()
                 .getClassLoader()
                 .getResourceAsStream("abiFiles/ZkSync.json"));
-        DecodedFunctionCall decode = decoder.decodeFunctionCall(FileUtil.read("abiFiles/zkSync-input/input_0xe35a7dceb1536dfbd819ab6f756e4dcb19ea09541df54abf0f40064ba1163981"));
+        DecodedFunctionCall decode = decoder.decodeFunctionCall(FileUtil.readFileIntoString("abiFiles/zkSync-input/input_0xe35a7dceb1536dfbd819ab6f756e4dcb19ea09541df54abf0f40064ba1163981"));
         Assertions.assertNotNull(decode);
         Assertions.assertEquals(funcName, decode.getName());
         Assertions.assertEquals(2, decode.getParams().size());
@@ -234,7 +234,7 @@ public class AbiDecoderTest {
         AbiDecoder decoder = new AbiDecoder(this.getClass()
                 .getClassLoader()
                 .getResourceAsStream("abiFiles/UniswapV3Router.json"));
-        DecodedFunctionCall decode = decoder.decodeFunctionCall(FileUtil.read("abiFiles/uniswapV3Router-input/input_0xeb154fb38972106bfc0e9bce28130379c44d80be292de775e0f43e2c861e0f48"));
+        DecodedFunctionCall decode = decoder.decodeFunctionCall(FileUtil.readFileIntoString("abiFiles/uniswapV3Router-input/input_0xeb154fb38972106bfc0e9bce28130379c44d80be292de775e0f43e2c861e0f48"));
         Assertions.assertNotNull(decode);
         Assertions.assertEquals(funcName, decode.getName());
         Assertions.assertEquals(1, decode.getParams().size());
@@ -256,7 +256,7 @@ public class AbiDecoderTest {
         AbiDecoder decoder = new AbiDecoder(this.getClass()
                 .getClassLoader()
                 .getResourceAsStream("abiFiles/TetherToken.json"));
-        DecodedFunctionCall log = decoder.decodeLogEvent(List.of(
+        DecodedFunctionCall log = decoder.decodeLogEvent(Arrays.asList(
                         "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
                         "0x000000000000000000000000abea9132b05a70803a4e85094fd0e1800777fbef",
                         "0x00000000000000000000000047c27dea4d3625169a3dcad8c1fc4375e1c0a8fc"),
@@ -273,7 +273,7 @@ public class AbiDecoderTest {
         AbiDecoder decoder = new AbiDecoder(this.getClass()
                 .getClassLoader()
                 .getResourceAsStream("abiFiles/TetherToken.json"));
-        Assertions.assertThrows(IllegalStateException.class, () -> decoder.decodeLogEvent(List.of("0xefef619ae4a542a2b8810b4efeccd8478bd683e985354ee31dd2d644aff6d0ca",
+        Assertions.assertThrows(IllegalStateException.class, () -> decoder.decodeLogEvent(Arrays.asList("0xefef619ae4a542a2b8810b4efeccd8478bd683e985354ee31dd2d644aff6d0ca",
                         "0x000000000000000000000000a5ece9bab9a0e56ad63ad0734033c944eeb00e1a",
                         "0x0000000000000000000000000000000000000000000000000000000000000000"),
                 "0x0000000000000000000000000000000000000000000000000020affce72f5800"));

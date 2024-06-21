@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,9 +52,11 @@ public class AbiDecoder {
         }
         AbiDefinition.Entry abiEntry = this.methodSignatures.get(methodBytes);
 
-        if (!(abiEntry instanceof AbiDefinition.Function abiFunction)) {
+        if (!(abiEntry instanceof AbiDefinition.Function)) {
             throw new IllegalArgumentException("Input data is not a function call, it's of type '" + abiEntry.type + "'.");
         }
+
+        AbiDefinition.Function abiFunction = (AbiDefinition.Function) abiEntry;
 
         List<DecodedFunctionCall.Param> params = new ArrayList<>(abiFunction.inputs.size());
         List<?> decoded = abiFunction.decode(Hex.decode(inputNoPrefix));
@@ -122,7 +123,8 @@ public class AbiDecoder {
         if (abiEntry == null) {
             throw new IllegalStateException("Couldn't find method with signature " + funcSignature);
         } else {
-            if (abiEntry instanceof AbiDefinition.Event abiEvent) {
+            if (abiEntry instanceof AbiDefinition.Event) {
+                AbiDefinition.Event abiEvent = (AbiDefinition.Event) abiEntry;
                 List<?> decoded = abiEvent.decode(hexBytes(data), topics
                         .stream()
                         .map(AbiDecoder::hexBytes)

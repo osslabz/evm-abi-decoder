@@ -45,9 +45,12 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
                 for (Entry.Param c : param.components) {
                     ((SolidityType.TupleType) param.type).getTypes().add(c.getType());
                 }
-            } else if (param.type instanceof SolidityType.ArrayType t && t.elementType instanceof SolidityType.TupleType) {
-                for (AbiDefinition.Entry.Param c : param.components) {
-                    ((SolidityType.TupleType) t.elementType).getTypes().add(c.getType());
+            } else if (param.type instanceof SolidityType.ArrayType) {
+                SolidityType.ArrayType arrayType = (SolidityType.ArrayType) param.type;
+                if (arrayType.elementType instanceof SolidityType.TupleType) {
+                    for (AbiDefinition.Entry.Param c : param.components) {
+                        ((SolidityType.TupleType) arrayType.elementType).getTypes().add(c.getType());
+                    }
                 }
             }
             return param;
@@ -141,12 +144,27 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
                                    @JsonProperty("outputs") List<Param> outputs,
                                    @JsonProperty("type") Type type,
                                    @JsonProperty(value = "payable", required = false, defaultValue = "false") Boolean payable) {
-            return switch (type) {
-                case constructor -> new Constructor(inputs, outputs);
-                case function, fallback, receive -> new Function(constant, name, inputs, outputs, payable);
-                case event -> new Event(anonymous, name, inputs, outputs);
-                case error -> new Error(name, inputs);
-            };
+            Entry result = null;
+            switch (type) {
+                case constructor:
+                    result = new Constructor(inputs, outputs);
+                    break;
+                case function:
+                case fallback:
+                    result = new Function(constant, name, inputs, outputs, payable);
+                    break;
+                case receive:
+                    result = new Function(constant, name, inputs, outputs, payable);
+                    break;
+                case event:
+                    result = new Event(anonymous, name, inputs, outputs);
+                    break;
+                case error:
+                    result = new Error(name, inputs);
+                    break;
+            }
+
+            return result;
         }
 
         public String formatSignature() {
@@ -165,7 +183,7 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
             String type = param.type.getCanonicalName();
             if (param.type instanceof SolidityType.TupleType) {
                 type = "(" + StringUtils.join(param.getComponents().stream().map(this::formatParamSignature).collect(Collectors.toList()), ",") + ")";
-            } else if (param.type instanceof SolidityType.ArrayType t && t.elementType instanceof SolidityType.TupleType) {
+            } else if (param.type instanceof SolidityType.ArrayType && ((SolidityType.ArrayType)param.type).elementType instanceof SolidityType.TupleType) {
                 type = "(" + StringUtils.join(param.getComponents().stream().map(this::formatParamSignature).collect(Collectors.toList()), ",") + ")[]";
             }
             return type;
