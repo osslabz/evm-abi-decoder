@@ -24,7 +24,7 @@
         <maven.compiler.target>${osslabz.java.version}</maven.compiler.target>
         <maven.compiler.release>${osslabz.java.version}</maven.compiler.release>
 
-        <jackson.version>2.18.0</jackson.version>
+        <jackson.version>2.18.1</jackson.version>
     </properties>
 
     <licenses>
