@@ -1,0 +1,66 @@
+name: build-release-on-main-push
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-release-on-main-push:
+    if: ${{ !contains(github.event.head_commit.message, '[release]') }} # prevent recursive releases
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: setup-jdk
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          cache: maven
+          server-id: ossrh
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
+          gpg-private-key: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+
+      - name: maven-build-verify
+        run: mvn --batch-mode verify
+
+      - name: configure-git-user
+        uses: qoomon/actions--setup-git@v1
+        with:
+          user: bot
+
+      - name: publish-on-maven-central
+        run: mvn --batch-mode -P osslabz-release clean release:clean release:prepare release:perform
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+
+      - name: 'get-latest-tag'
+        id: 'get-latest-tag'
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
+      - name: create-release-notes
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          tag_name: ${{ steps.get-latest-tag.outputs.tag }}
+
+      - name: merge-main-to-dev
+        run: |
+          git fetch --unshallow
+          git checkout dev
+          git pull
+          git merge --no-ff main -m "[release] auto-merge released main back to dev"
+          git push

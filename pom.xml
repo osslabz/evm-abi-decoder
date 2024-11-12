@@ -5,7 +5,7 @@
 
     <groupId>net.osslabz</groupId>
     <artifactId>evm-abi-decoder</artifactId>
-    <version>0.0.11</version>
+    <version>0.1.0-SNAPSHOT</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Allows to decode raw input data from an EVM smart contract call (on Ethereum or a compatible chain like
@@ -20,11 +20,11 @@
         <project.build.sourceEncoding>${osslabz.encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${osslabz.encoding}</project.reporting.outputEncoding>
 
-        <maven.compiler.source>${osslabz.java.version}</maven.compiler.source>
-        <maven.compiler.target>${osslabz.java.version}</maven.compiler.target>
+        <project.build.outputTimestamp>2024-11-11T10:28:26Z</project.build.outputTimestamp>
+
         <maven.compiler.release>${osslabz.java.version}</maven.compiler.release>
 
-        <jackson.version>2.18.1</jackson.version>
+        <lombok.version>1.18.34</lombok.version>
     </properties>
 
     <licenses>
@@ -39,32 +39,22 @@
             <name>Raphael Vullriede</name>
             <email>raphael@osslabz.net</email>
             <organization>osslabz.net</organization>
-            <organizationUrl>http://www.osslabz.net</organizationUrl>
+            <organizationUrl>https://www.osslabz.net</organizationUrl>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:ssh://git@github.com/osslabz/evm-abi-decoder.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/osslabz/evm-abi-decoder.git</developerConnection>
+        <connection>scm:git:https://github.com/osslabz/evm-abi-decoder.git</connection>
+        <developerConnection>scm:git:https://github.com/osslabz/evm-abi-decoder.git</developerConnection>
         <url>https://github.com/osslabz/evm-abi-decoder</url>
-        <tag>HEAD</tag>
+        <tag>main</tag>
     </scm>
 
     <dependencies>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
+            <version>2.18.1</version>
         </dependency>
 
         <dependency>
@@ -87,7 +77,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.32</version>
+            <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -98,15 +88,13 @@
             <version>2.0.16</version>
         </dependency>
 
-
-        <!-- Test dependencies -->
+        <!-- test dependencies -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>5.11.3</version>
             <scope>test</scope>
         </dependency>
-
         <!-- default logging impl for tests -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -116,7 +104,6 @@
         </dependency>
     </dependencies>
 
-
     <profiles>
         <profile>
             <id>osslabz-release</id>
@@ -124,16 +111,32 @@
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>3.3.1</version>
-                        <executions>
-                            <execution>
-                                <id>attach-sources</id>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>3.1.1</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>nl.basjes.maven.release</groupId>
+                                <artifactId>conventional-commits-version-policy</artifactId>
+                                <version>1.0.7</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <!-- settings from the maven-release-plugin itself -->
+                            <autoVersionSubmodules>true</autoVersionSubmodules>
+                            <useReleaseProfile>false</useReleaseProfile>
+                            <releaseProfiles>osslabz-release</releaseProfiles>
+                            <tagNameFormat>@{project.version}</tagNameFormat>
+                            <scmCommentPrefix>[release]</scmCommentPrefix>
+                            <scmReleaseCommitComment>@{prefix} set version to @{releaseLabel}</scmReleaseCommitComment>
+                            <scmDevelopmentCommitComment>@{prefix} prepare for next development iteration</scmDevelopmentCommitComment>
+
+                            <!-- settings from the conventional-commits-version-policy -->
+                            <projectVersionPolicyId>ConventionalCommitsVersionPolicy</projectVersionPolicyId>
+                            <projectVersionPolicyConfig>
+                                <versionTag>([0-9]+\.[0-9]+\.[0-9]+)$</versionTag>
+                            </projectVersionPolicyConfig>
+                            <goals>deploy</goals>
+                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -155,7 +158,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.6</version>
+                        <version>3.2.7</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>
@@ -163,6 +166,12 @@
                                 <goals>
                                     <goal>sign</goal>
                                 </goals>
+                                <configuration>
+                                    <gpgArguments>
+                                        <arg>--pinentry-mode</arg>
+                                        <arg>loopback</arg>
+                                    </gpgArguments>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
@@ -181,6 +190,68 @@
             </build>
         </profile>
     </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <release>${maven.compiler.release}</release>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>io.github.git-commit-id</groupId>
+                <artifactId>git-commit-id-maven-plugin</artifactId>
+                <version>9.0.1</version>
+                <executions>
+                    <execution>
+                        <id>git-info</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <includeOnlyProperties>
+                        <includeOnlyProperty>git.branch</includeOnlyProperty>
+                        <includeOnlyProperty>^git.build.(time|version)$</includeOnlyProperty>
+                        <includeOnlyProperty>^git.commit.id.(abbrev|full)$</includeOnlyProperty>
+                    </includeOnlyProperties>
+                    <commitIdGenerationMode>full</commitIdGenerationMode>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
