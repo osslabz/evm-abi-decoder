@@ -2,13 +2,14 @@ name: dependabot-pr-auto-merge
 
 on: pull_request
 
-permissions:
-  contents: write
-  pull-requests: write
 
 jobs:
   dependabot-pr-auto-merge:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
 
     if: github.actor == 'dependabot[bot]'
     steps:
@@ -19,8 +20,10 @@ jobs:
         run: gh pr review --approve "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
       - name: dependabot-pr-auto-merge
         run: gh pr merge --auto --merge "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
