@@ -1,8 +1,11 @@
 EVM ABI Decoder
 ===============
 ![GitHub](https://img.shields.io/github/license/osslabz/evm-abi-decoder)
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/osslabz/evm-abi-decoder/build-on-push.yml?branch=main)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/osslabz/evm-abi-decoder/build-on-push.yml?branch=dev&label=build&logo=git)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/osslabz/evm-abi-decoder/build-release-on-main-push.yml?branch=main&label=perform-release&logo=semanticrelease)
+[![Reproducible Builds](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/jvm-repo-rebuild/reproducible-central/master/content/net/osslabz/evm-abi-decoder/badge.json)](https://github.com/jvm-repo-rebuild/reproducible-central/blob/master/content/net/osslabz/evm-abi-decoder/README.md)
 [![Maven Central](https://img.shields.io/maven-central/v/net.osslabz/evm-abi-decoder?label=Maven%20Central)](https://search.maven.org/artifact/net.osslabz/evm-abi-decoder)
+
 
 EVM ABI Decoder allows to decode raw input data from a EVM transaction (on Ethereum or a compatible chain like Avalanche, BSC etc.)
 into a processable format obtained from the contract's ABi definition (JSON).
