@@ -1,0 +1,16 @@
+<ruleset comparisonMethod="maven"
+    xmlns="http://mojo.codehaus.org/versions-maven-plugin/rule/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://mojo.codehaus.org/versions-maven-plugin/rule/2.0.0
+         http://mojo.codehaus.org/versions-maven-plugin/rule/2.0.0.xsd">
+    <ignoreVersions>
+        <ignoreVersion type="regex">.*-M\d+</ignoreVersion>
+        <ignoreVersion type="regex">.*-RC\d+</ignoreVersion>
+        <ignoreVersion type="regex">.*-beta.*</ignoreVersion>
+        <ignoreVersion type="regex">.*-alpha.*</ignoreVersion>
+        <ignoreVersion type="regex">.*\.M\d+</ignoreVersion>
+        <ignoreVersion type="regex">.*\.RC\d+</ignoreVersion>
+        <ignoreVersion type="regex">.*\.Beta.*</ignoreVersion>
+        <ignoreVersion type="regex">.*\.Alpha.*</ignoreVersion>
+    </ignoreVersions>
+</ruleset>
