@@ -26,7 +26,7 @@ jobs:
           java-version: 21
           distribution: 'temurin'
           cache: maven
-          server-id: ossrh
+          server-id: central
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
           gpg-private-key: ${{ secrets.OSSRH_GPG_SECRET_KEY }}
@@ -40,8 +40,16 @@ jobs:
         with:
           user: bot
 
-      - name: publish-on-maven-central
-        run: mvn --batch-mode -P osslabz-release clean release:clean release:prepare release:perform
+      # For reproducible builds is it required to separate release:prepare (with -DskipStaging=true) and release:perform, otherwise
+      # the artifact will be already uploaded during release:prepare
+
+      - name: prepare-release
+        run: mvn --batch-mode -P osslabz-release release:prepare -DskipStaging=true
+        env:
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+
+      - name: perform-release-publish-on-maven-central
+        run: mvn --batch-mode -P osslabz-release release:perform
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
