@@ -9,6 +9,9 @@ jobs:
   build-on-push:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: read
+
     steps:
       - name: checkout
         uses: actions/checkout@v5
@@ -21,4 +24,4 @@ jobs:
           cache: maven
 
       - name: maven-build-verify
-        run: mvn --batch-mode --update-snapshots verify
+        run: mvn --batch-mode --update-snapshots clean verify

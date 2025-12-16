@@ -1,8 +1,9 @@
 name: dependabot-pr-auto-merge
 
-on: pull_request
-
-
+on:
+  pull_request:
+    branches:
+      - dev
 jobs:
   dependabot-pr-auto-merge:
     runs-on: ubuntu-latest
