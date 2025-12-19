@@ -19,6 +19,8 @@ jobs:
         uses: actions/checkout@v5
         with:
           ref: main
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: setup-jdk
         uses: actions/setup-java@v5
@@ -48,16 +50,16 @@ jobs:
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
 
+      - name: 'get-latest-tag'
+        id: 'get-latest-tag'
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+
       - name: perform-release-publish-on-maven-central
-        run: mvn --batch-mode -P osslabz-release release:perform
+        run: mvn --batch-mode -P osslabz-release release:perform -Dtag=${{ steps.get-latest-tag.outputs.tag }}
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
-
-      - name: 'get-latest-tag'
-        id: 'get-latest-tag'
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
 
       - name: create-release-notes
         uses: softprops/action-gh-release@v2
