@@ -122,7 +122,6 @@
                         <configuration>
                             <!-- settings from the maven-release-plugin itself -->
                             <autoVersionSubmodules>true</autoVersionSubmodules>
-                            <useReleaseProfile>false</useReleaseProfile>
                             <releaseProfiles>osslabz-release</releaseProfiles>
                             <tagNameFormat>@{project.version}</tagNameFormat>
                             <scmCommentPrefix>[release]</scmCommentPrefix>
