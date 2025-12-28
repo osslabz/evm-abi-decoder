@@ -4,7 +4,7 @@
 
     <groupId>net.osslabz</groupId>
     <artifactId>evm-abi-decoder</artifactId>
-    <version>0.1.5-SNAPSHOT</version>
+    <version>0.1.6-SNAPSHOT</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Allows to decode raw input data from an EVM smart contract call (on Ethereum or a compatible chain like
@@ -19,7 +19,7 @@
         <project.build.sourceEncoding>${osslabz.encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${osslabz.encoding}</project.reporting.outputEncoding>
 
-        <project.build.outputTimestamp>2025-12-19T21:12:13Z</project.build.outputTimestamp>
+        <project.build.outputTimestamp>2025-12-28T17:57:48Z</project.build.outputTimestamp>
 
         <maven.compiler.release>${osslabz.java.version}</maven.compiler.release>
 
