@@ -46,16 +46,24 @@ jobs:
       # the artifact will be already uploaded during release:prepare
 
       - name: prepare-release
-        run: mvn --batch-mode -P osslabz-release release:prepare -DskipStaging=true -X
+        run: mvn --batch-mode -P osslabz-release release:prepare -DskipStaging=true
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+
+      - name: push-tag
+        run: |
+          git push origin --tags
 
       - name: 'get-latest-tag'
         id: 'get-latest-tag'
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
 
+      - name: git-checkout-tag
+        run: |
+          git checkout ${{ steps.get-latest-tag.outputs.tag }}
+
       - name: perform-release-publish-on-maven-central
-        run: mvn --batch-mode -P osslabz-release release:perform -Dtag=${{ steps.get-latest-tag.outputs.tag }} -X
+        run: mvn --batch-mode -P osslabz-release release:perform -Dtag=${{ steps.get-latest-tag.outputs.tag }}
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
@@ -69,6 +77,8 @@ jobs:
 
       - name: merge-main-to-dev
         run: |
+          git checkout main
+          git pull
           git checkout dev
           git pull
           git merge --no-ff main -m "[release] auto-merge released main back to dev"
