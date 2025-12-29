@@ -42,13 +42,12 @@ jobs:
         with:
           user: bot
 
-      # For reproducible builds is it required to separate release:prepare (with -DskipStaging=true) and release:perform, otherwise
-      # the artifact will be already uploaded during release:prepare
-
-      - name: prepare-release
-        run: mvn --batch-mode -P osslabz-release release:prepare -DskipStaging=true
+      - name: release-publish-on-maven-central
+        run: mvn --batch-mode -P osslabz-release release:prepare release:perform
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
 
       - name: push-tag
         run: |
@@ -57,17 +56,6 @@ jobs:
       - name: 'get-latest-tag'
         id: 'get-latest-tag'
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
-
-      - name: git-checkout-tag
-        run: |
-          git checkout ${{ steps.get-latest-tag.outputs.tag }}
-
-      - name: perform-release-publish-on-maven-central
-        run: mvn --batch-mode -P osslabz-release release:perform -Dtag=${{ steps.get-latest-tag.outputs.tag }}
-        env:
-          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-          MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
 
       - name: create-release-notes
         uses: softprops/action-gh-release@v2
