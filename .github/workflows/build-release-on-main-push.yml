@@ -43,15 +43,11 @@ jobs:
           user: bot
 
       - name: release-publish-on-maven-central
-        run: mvn --batch-mode -P osslabz-release release:prepare release:perform
+        run: mvn --batch-mode -P osslabz-release clean release:prepare release:perform
         env:
           MAVEN_GPG_PASSPHRASE: ${{ secrets.OSSRH_GPG_SECRET_KEY_PASSWORD }}
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
-
-      - name: push-tag
-        run: |
-          git push origin --tags
 
       - name: 'get-latest-tag'
         id: 'get-latest-tag'
