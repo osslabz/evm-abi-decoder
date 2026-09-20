@@ -22,6 +22,27 @@ jobs:
           java-version: 17 # later version don't support a compile target of Java which is important for some users
           distribution: 'temurin'
           cache: maven
+          server-id: central
+          server-username: MAVEN_USERNAME
+          server-password: MAVEN_PASSWORD
 
-      - name: maven-build-verify
-        run: mvn --batch-mode --update-snapshots clean verify
+      # After setup-jdk, which keys its Maven cache on the poms' contents: rewriting them
+      # first would miss that cache on every branch but dev.
+      - name: set-snapshot-version
+        uses: osslabz/github-actions/snapshot-version@v1
+        with:
+          default-branch: dev
+
+      # Snapshots publish from dev only; main publishes releases through
+      # build-release-on-main-push. Central's publishing limits harden on 2026-10-01 and
+      # Sonatype does not say whether snapshots count toward them, so feature branches build
+      # without publishing. osslabz-publish carries central-publishing-maven-plugin, which
+      # routes a -SNAPSHOT to Central's snapshot repository by itself; the signature stays in
+      # osslabz-release, because Central validates a release and takes a snapshot as it comes.
+      # Dependabot's runs reach no repository secrets and so never publish either.
+      - name: maven-build-publish
+        env:
+          MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
+          MAVEN_GOAL: ${{ (github.ref_name == 'dev' && github.actor != 'dependabot[bot]') && 'deploy' || 'verify' }}
+        run: mvn --batch-mode --update-snapshots "$MAVEN_GOAL" -P osslabz-publish
