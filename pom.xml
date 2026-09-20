@@ -105,35 +105,22 @@
 
     <profiles>
         <profile>
-            <id>osslabz-release</id>
+            <!-- Publishing, both paths: the plugin reads the version and routes a
+                 -SNAPSHOT straight to Central's snapshot repository, a release through
+                 the Portal. Separate from osslabz-release so the push build can publish
+                 a snapshot without the signature Central asks only of releases. Javadoc
+                 sits here so a snapshot carries it too. -->
+            <id>osslabz-publish</id>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-release-plugin</artifactId>
-                        <version>3.3.1</version>
-                        <dependencies>
-                            <dependency>
-                                <groupId>nl.basjes.maven.release</groupId>
-                                <artifactId>conventional-commits-version-policy</artifactId>
-                                <version>1.0.9</version>
-                            </dependency>
-                        </dependencies>
+                        <groupId>org.sonatype.central</groupId>
+                        <artifactId>central-publishing-maven-plugin</artifactId>
+                        <version>0.11.0</version>
+                        <extensions>true</extensions>
                         <configuration>
-                            <!-- settings from the maven-release-plugin itself -->
-                            <autoVersionSubmodules>true</autoVersionSubmodules>
-                            <releaseProfiles>osslabz-release</releaseProfiles>
-                            <tagNameFormat>@{project.version}</tagNameFormat>
-                            <scmCommentPrefix>[release]</scmCommentPrefix>
-                            <scmReleaseCommitComment>@{prefix} set version to @{releaseLabel}</scmReleaseCommitComment>
-                            <scmDevelopmentCommitComment>@{prefix} prepare for next development iteration</scmDevelopmentCommitComment>
-
-                            <!-- settings from the conventional-commits-version-policy -->
-                            <projectVersionPolicyId>ConventionalCommitsVersionPolicy</projectVersionPolicyId>
-                            <projectVersionPolicyConfig>
-                                <versionTag>([0-9]+\.[0-9]+\.[0-9]+)$</versionTag>
-                            </projectVersionPolicyConfig>
-                            <goals>deploy</goals>
+                            <autoPublish>true</autoPublish>
+                            <waitUntil>published</waitUntil>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -152,6 +139,41 @@
                                 </configuration>
                             </execution>
                         </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>osslabz-release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-release-plugin</artifactId>
+                        <version>3.3.1</version>
+                        <dependencies>
+                            <dependency>
+                                <groupId>nl.basjes.maven.release</groupId>
+                                <artifactId>conventional-commits-version-policy</artifactId>
+                                <version>1.0.9</version>
+                            </dependency>
+                        </dependencies>
+                        <configuration>
+                            <!-- settings from the maven-release-plugin itself -->
+                            <autoVersionSubmodules>true</autoVersionSubmodules>
+                            <releaseProfiles>osslabz-release,osslabz-publish</releaseProfiles>
+                            <tagNameFormat>@{project.version}</tagNameFormat>
+                            <scmCommentPrefix>[release]</scmCommentPrefix>
+                            <scmReleaseCommitComment>@{prefix} set version to @{releaseLabel}</scmReleaseCommitComment>
+                            <scmDevelopmentCommitComment>@{prefix} prepare for next development iteration</scmDevelopmentCommitComment>
+
+                            <!-- settings from the conventional-commits-version-policy -->
+                            <projectVersionPolicyId>ConventionalCommitsVersionPolicy</projectVersionPolicyId>
+                            <projectVersionPolicyConfig>
+                                <versionTag>([0-9]+\.[0-9]+\.[0-9]+)$</versionTag>
+                            </projectVersionPolicyConfig>
+                            <goals>deploy</goals>
+                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -172,16 +194,6 @@
                                 </configuration>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.sonatype.central</groupId>
-                        <artifactId>central-publishing-maven-plugin</artifactId>
-                        <version>0.11.0</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <autoPublish>true</autoPublish>
-                            <waitUntil>published</waitUntil>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
