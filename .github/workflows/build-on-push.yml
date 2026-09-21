@@ -8,9 +8,16 @@ on:
   # dispatch this workflow on dev to build and publish what they pushed.
   workflow_dispatch:
 
+concurrency:
+  group: build-on-push-${{ github.ref }}
+  # A newer push cancels an in-progress branch build; dev builds are never cancelled mid-run,
+  # and a newer dev push replaces only an older pending run (which already covers its predecessor's snapshot).
+  cancel-in-progress: ${{ github.ref_name != 'dev' }}
+
 jobs:
   build-on-push:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     permissions:
       contents: read
