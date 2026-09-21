@@ -33,8 +33,8 @@ jobs:
         with:
           default-branch: dev
 
-      # Snapshots publish from dev only; main publishes releases through
-      # build-release-on-main-push. Central's publishing limits harden on 2026-10-01 and
+      # Snapshots publish from dev only; releases publish through the release workflow,
+      # dispatched on dev. Central's publishing limits harden on 2026-10-01 and
       # Sonatype does not say whether snapshots count toward them, so feature branches build
       # without publishing. osslabz-publish carries central-publishing-maven-plugin, which
       # routes a -SNAPSHOT to Central's snapshot repository by itself; the signature stays in

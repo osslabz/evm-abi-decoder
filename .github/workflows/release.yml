@@ -1,13 +1,10 @@
-name: build-release-on-main-push
+name: release
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
-  build-release-on-main-push:
-    if: ${{ !contains(github.event.head_commit.message, '[release]') }} # prevent recursive releases
+  release:
     runs-on: ubuntu-latest
 
     permissions:
@@ -15,10 +12,19 @@ jobs:
       packages: write
 
     steps:
+      # workflow_dispatch has no branch filter; a failing step rather than a job-level `if`,
+      # which would report a mis-dispatch as a green skip.
+      - name: guard-release-ref
+        run: |
+          if [ "$GITHUB_REF" != "refs/heads/dev" ]; then
+            echo "::error::releases run on dev only; this run was dispatched from $GITHUB_REF"
+            exit 1
+          fi
+
+      # No `ref`: maven-scm pushes the release commits to the branch checked out, which is dev.
       - name: checkout
         uses: actions/checkout@v5
         with:
-          ref: main
           fetch-depth: 0
           fetch-tags: true
 
@@ -53,17 +59,17 @@ jobs:
         id: 'get-latest-tag'
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
 
+      # main only follows the published tag, and without --force git accepts nothing but a
+      # fast-forward. The tag is annotated and a branch cannot point at a tag object.
+      - name: fast-forward-main
+        env:
+          TAG: ${{ steps.get-latest-tag.outputs.tag }}
+        run: |
+          tag_commit="$(git rev-parse "refs/tags/${TAG}^{commit}")"
+          git push origin "${tag_commit}:refs/heads/main"
+
       - name: create-release-notes
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           tag_name: ${{ steps.get-latest-tag.outputs.tag }}
-
-      - name: merge-main-to-dev
-        run: |
-          git checkout main
-          git pull
-          git checkout dev
-          git pull
-          git merge --no-ff main -m "[release] auto-merge released main back to dev"
-          git push
