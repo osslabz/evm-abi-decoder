@@ -104,9 +104,10 @@
     </dependencies>
 
     <repositories>
-        <!-- Our own snapshots publish here, and Central's snapshot repository is not
-             among Maven's built-in defaults the way its releases are. Releases stay off so
-             nothing else resolves through it. -->
+        <!-- Serves osslabz and peekaboot snapshots only. codelabz artifacts always
+             resolve from GitHub Packages, releases and snapshots alike. Central's snapshot
+             repository is not one of Maven's built-in defaults the way its releases are,
+             and releases stay off here so nothing else resolves through it. -->
         <repository>
             <id>central-snapshots</id>
             <name>Central Snapshots</name>
