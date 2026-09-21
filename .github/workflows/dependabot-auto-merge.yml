@@ -1,0 +1,15 @@
+name: dependabot-auto-merge
+
+on:
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  dependabot-auto-merge:
+    # Covers every job of the shared workflow; each job takes only what it needs.
+    permissions:
+      contents: write
+      pull-requests: write
+      actions: write
+    uses: osslabz/github-actions/.github/workflows/dependabot-auto-merge.yml@cd44fe64640f7f457c7f1074a35d2d1037c1fb01
