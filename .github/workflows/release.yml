@@ -23,7 +23,7 @@ jobs:
 
       # No `ref`: maven-scm pushes the release commits to the branch checked out, which is dev.
       - name: checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           fetch-tags: true
