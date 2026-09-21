@@ -103,6 +103,23 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <!-- Our own snapshots publish here, and Central's snapshot repository is not
+             among Maven's built-in defaults the way its releases are. Releases stay off so
+             nothing else resolves through it. -->
+        <repository>
+            <id>central-snapshots</id>
+            <name>Central Snapshots</name>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <profiles>
         <profile>
             <!-- Publishing, both paths: the plugin reads the version and routes a
