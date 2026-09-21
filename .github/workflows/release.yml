@@ -57,7 +57,7 @@ jobs:
 
       - name: 'get-latest-tag'
         id: 'get-latest-tag'
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        uses: "WyriHaximus/github-action-get-previous-tag@v2"
 
       # main only follows the published tag, and without --force git accepts nothing but a
       # fast-forward. The tag is annotated and a branch cannot point at a tag object.
