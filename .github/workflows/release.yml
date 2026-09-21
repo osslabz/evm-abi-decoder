@@ -14,7 +14,7 @@ jobs:
     permissions:
       contents: write
       actions: write
-    uses: osslabz/github-actions/.github/workflows/release.yml@cd44fe64640f7f457c7f1074a35d2d1037c1fb01
+    uses: osslabz/github-actions/.github/workflows/release.yml@v1
     with:
       publish-target: central
       maven-profiles: osslabz-release,osslabz-publish

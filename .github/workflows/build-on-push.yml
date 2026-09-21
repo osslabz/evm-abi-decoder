@@ -24,7 +24,7 @@ jobs:
   build-on-push:
     permissions:
       contents: read
-    uses: osslabz/github-actions/.github/workflows/build.yml@3e1858352850e5e8dd6efd2263ebfcfc1a0d727e
+    uses: osslabz/github-actions/.github/workflows/build.yml@v1
     with:
       publish-target: central
       publish-branches: dev
