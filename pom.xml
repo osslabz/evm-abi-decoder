@@ -181,9 +181,9 @@
                             <autoVersionSubmodules>true</autoVersionSubmodules>
                             <releaseProfiles>osslabz-release,osslabz-publish</releaseProfiles>
                             <tagNameFormat>@{project.version}</tagNameFormat>
-                            <scmCommentPrefix>[release]</scmCommentPrefix>
+                            <scmCommentPrefix>chore(release):</scmCommentPrefix>
                             <scmReleaseCommitComment>@{prefix} set version to @{releaseLabel}</scmReleaseCommitComment>
-                            <scmDevelopmentCommitComment>@{prefix} prepare for next development iteration</scmDevelopmentCommitComment>
+                            <scmDevelopmentCommitComment>@{prefix} prepare next development iteration</scmDevelopmentCommitComment>
 
                             <!-- settings from the conventional-commits-version-policy -->
                             <projectVersionPolicyId>ConventionalCommitsVersionPolicy</projectVersionPolicyId>
