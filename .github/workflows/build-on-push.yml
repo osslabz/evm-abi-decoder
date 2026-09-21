@@ -4,6 +4,9 @@ on:
   push:
     branches-ignore:
       - main
+  # Pushes made with GITHUB_TOKEN start no run, so the release and the Dependabot merge
+  # dispatch this workflow on dev to build and publish what they pushed.
+  workflow_dispatch:
 
 jobs:
   build-on-push:
