@@ -25,6 +25,14 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # commit-subject-check reads the pushed range
+          fetch-depth: 0
+
+      - name: check-commit-subjects
+        uses: osslabz/github-actions/commit-subject-check@cd44fe64640f7f457c7f1074a35d2d1037c1fb01
+        with:
+          default-branch: dev
 
       - name: setup-jdk
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1

@@ -1,13 +1,20 @@
 version: 2
 updates:
+  # Every commit subject is checked on push, Dependabot's too: chore(deps) and chore(deps-dev).
   - package-ecosystem: "maven"
     directory: "/"
     schedule:
       interval: "daily"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
     # Pinned by SHA, every release of every action is an update; one pull request a week
     # carries them through one build and one merge.
     groups:
