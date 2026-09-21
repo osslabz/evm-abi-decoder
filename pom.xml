@@ -269,9 +269,8 @@
                 </executions>
                 <configuration>
                     <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <!-- Branch and tag names vary with checkout and CI, so rebuilds from the tag would differ. -->
                     <includeOnlyProperties>
-                        <includeOnlyProperty>git.branch</includeOnlyProperty>
-                        <includeOnlyProperty>git.tag</includeOnlyProperty>
                         <includeOnlyProperty>git.build.version</includeOnlyProperty>
                         <includeOnlyProperty>^git.commit.id.(abbrev|full)$</includeOnlyProperty>
                     </includeOnlyProperties>
