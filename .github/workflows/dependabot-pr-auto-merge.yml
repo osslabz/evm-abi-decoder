@@ -7,24 +7,44 @@ on:
 jobs:
   dependabot-pr-auto-merge:
     runs-on: ubuntu-latest
+    # The merge step waits for build-on-push, which sets no timeout of its own. Bounded far below
+    # the six-hour default the wait would otherwise inherit.
+    timeout-minutes: 30
 
     permissions:
       contents: write
       pull-requests: write
+      actions: read
+      checks: read
 
     if: github.actor == 'dependabot[bot]'
     steps:
       - name: dependabot-pr-fetch-metadata
-        uses: dependabot/fetch-metadata@v2
+        id: metadata
+        uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
 
-      - name: dependabot-pr-approve
-        run: gh pr review --approve "$PR_URL"
+      # Major updates wait for a human.
+      # One step for all commands: the condition reads this job's metadata step, which a
+      # job-level `if` cannot see.
+      - name: dependabot-pr-approve-and-merge
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        # Waits for the build rather than using `gh pr merge --auto`: auto-merge is disabled for
+        # this repository and nothing requires a check. A red or cancelled build exits non-zero
+        # here and the pull request stays open for a human.
+        # Watches this commit's build-on-push run, not `gh pr checks --watch`: that counts this job
+        # as a pending check of the pull request and would wait for itself.
+        # --match-head-commit: a newer push to the pull request gets its own run of this workflow.
+        # --rebase keeps history linear and keeps Dependabot's conventional subject, which squash
+        # would replace with the pull request title.
+        run: |
+          gh pr review --approve "$PR_URL"
+          until run_id=$(gh run list --workflow build-on-push.yml --commit "$HEAD_SHA" --json databaseId --jq '.[0].databaseId // empty') && [ -n "$run_id" ]; do
+            sleep 10
+          done
+          gh run watch "$run_id" --exit-status --interval 30
+          gh pr merge --rebase --match-head-commit "$HEAD_SHA" "$PR_URL"
         env:
           PR_URL: ${{github.event.pull_request.html_url}}
-          GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-
-      - name: dependabot-pr-auto-merge
-        run: gh pr merge --auto --merge "$PR_URL"
-        env:
-          PR_URL: ${{github.event.pull_request.html_url}}
+          HEAD_SHA: ${{github.event.pull_request.head.sha}}
+          GH_REPO: ${{github.repository}}
           GH_TOKEN: ${{secrets.GITHUB_TOKEN}}
