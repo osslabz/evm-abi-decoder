@@ -10,6 +10,10 @@ EVM ABI Decoder
 EVM ABI Decoder allows to decode raw input data from a EVM transaction (on Ethereum or a compatible chain like Avalanche, BSC etc.)
 into a processable format obtained from the contract's ABi definition (JSON).
 
+Eleven releases under `net.osslabz` since July 2023, the newest 0.1.6 from December 2025, plus a few outside
+contributions. The tests decode real transaction input against real ABI files and assert every decoded parameter, so the
+decoding path is covered; the API is still 0.x.
+
 **Acknowledgement**:
 This project is based on [Bryce Neals's](https://github.com/prettymuchbryce) project [abidecoder](https://github.com/prettymuchbryce/abidecoder) (Kotlin), which itself is a port
 of [ConsenSys](https://github.com/ConsenSys) project [abi-decoder](https://github.com/ConsenSys/abi-decoder) (JavaScript).
@@ -28,7 +32,7 @@ Maven
 <dependency>
     <groupId>net.osslabz</groupId>
     <artifactId>evm-abi-decoder</artifactId>
-    <version>0.1.2</version>
+    <version>0.1.6</version>
 </dependency>
 ```
 
