@@ -40,6 +40,9 @@ jobs:
           java-version: 25
           distribution: 'temurin'
           cache: maven
+          # A Dependabot branch's poms miss the cache, and the entry it would save is readable
+          # from that branch only.
+          cache-read-only: ${{ startsWith(github.ref_name, 'dependabot/') }}
           server-id: central
           server-username-env-var: MAVEN_USERNAME
           server-password-env-var: MAVEN_PASSWORD
