@@ -23,8 +23,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
           server-id: central
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
+          server-username-env-var: MAVEN_USERNAME
+          server-password-env-var: MAVEN_PASSWORD
 
       # After setup-jdk, which keys its Maven cache on the poms' contents: rewriting them
       # first would miss that cache on every branch but dev.
