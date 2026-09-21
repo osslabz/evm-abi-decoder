@@ -227,6 +227,11 @@
                 <version>3.16.0</version>
                 <configuration>
                     <release>${maven.compiler.release}</release>
+                    <!-- Some users still need Java 8 bytecode. javac 25 compiles it but warns
+                         that release 8 is obsolete, and -Xlint:-options drops that warning. -->
+                    <compilerArgs>
+                        <arg>-Xlint:-options</arg>
+                    </compilerArgs>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>

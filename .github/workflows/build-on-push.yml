@@ -19,7 +19,7 @@ jobs:
       - name: setup-jdk
         uses: actions/setup-java@v6
         with:
-          java-version: 17 # later version don't support a compile target of Java which is important for some users
+          java-version: 25
           distribution: 'temurin'
           cache: maven
           server-id: central
