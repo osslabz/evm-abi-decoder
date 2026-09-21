@@ -180,7 +180,9 @@
                             <autoVersionSubmodules>true</autoVersionSubmodules>
                             <releaseProfiles>osslabz-release,osslabz-publish</releaseProfiles>
                             <tagNameFormat>@{project.version}</tagNameFormat>
-                            <scmCommentPrefix>chore(release):</scmCommentPrefix>
+                            <!-- xml:space="preserve" keeps the trailing space Plexus would otherwise trim;
+                                 ScmTagPhase concatenates this prefix straight into the tag message. -->
+                            <scmCommentPrefix xml:space="preserve">chore(release): </scmCommentPrefix>
                             <scmReleaseCommitComment>@{prefix} set version to @{releaseLabel}</scmReleaseCommitComment>
                             <scmDevelopmentCommitComment>@{prefix} prepare next development iteration</scmDevelopmentCommitComment>
 
