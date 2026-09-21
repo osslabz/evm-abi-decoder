@@ -23,11 +23,11 @@ jobs:
         id: metadata
         uses: dependabot/fetch-metadata@25dd0e34f4fe68f24cc83900b1fe3fe149efef98 # v3.1.0
 
-      # Major updates wait for a human.
+      # Major updates wait for a human, except for GitHub Actions.
       # One step for all commands: the condition reads this job's metadata step, which a
       # job-level `if` cannot see.
       - name: dependabot-pr-approve-and-merge
-        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major' || steps.metadata.outputs.package-ecosystem == 'github_actions'
         # Waits for the build rather than using `gh pr merge --auto`: auto-merge is disabled for
         # this repository and nothing requires a check. A red or cancelled build exits non-zero
         # here and the pull request stays open for a human.
