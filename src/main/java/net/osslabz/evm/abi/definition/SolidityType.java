@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import lombok.Getter;
 import net.osslabz.evm.abi.util.ByteUtil;
 
@@ -358,7 +359,7 @@ public abstract class SolidityType {
         BigInteger encodeInternal(Object value) {
             BigInteger bigInt;
             if (value instanceof String) {
-                String s = ((String) value).toLowerCase().trim();
+                String s = ((String) value).toLowerCase(Locale.ROOT).trim();
                 int radix = 10;
                 if (s.startsWith("0x")) {
                     s = s.substring(2);

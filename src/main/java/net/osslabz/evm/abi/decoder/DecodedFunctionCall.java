@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import lombok.Data;
 import net.osslabz.evm.abi.util.ByteUtil;
@@ -19,12 +20,12 @@ public class DecodedFunctionCall {
         this.name = name;
         this.params = new LinkedHashMap<>();
         for (Param param : params) {
-            this.params.put(param.getName().toLowerCase(), param);
+            this.params.put(param.getName().toLowerCase(Locale.ROOT), param);
         }
     }
 
     public Param getParam(String paramName) {
-        return this.params.get(paramName.toLowerCase());
+        return this.params.get(paramName.toLowerCase(Locale.ROOT));
     }
 
     public Map<String, Param> params() {
