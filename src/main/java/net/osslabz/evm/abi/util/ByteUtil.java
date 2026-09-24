@@ -99,10 +99,7 @@ public class ByteUtil {
         return bytes;
     }
 
-    /**
-     * @param arrays - arrays to merge
-     * @return - merged array
-     */
+    /** Concatenates the arrays in order. */
     public static byte[] merge(byte[]... arrays) {
         int count = 0;
         for (byte[] array : arrays) {

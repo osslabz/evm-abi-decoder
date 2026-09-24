@@ -80,11 +80,7 @@ public abstract class SolidityType {
         return getName();
     }
 
-    /**
-     * Encodes the value according to specific type rules
-     *
-     * @param value
-     */
+    /** Encodes the value according to specific type rules. */
     public abstract byte[] encode(Object value);
 
     public abstract Object decode(byte[] encoded, int offset);
@@ -94,8 +90,8 @@ public abstract class SolidityType {
     }
 
     /**
-     * @return fixed size in bytes. For the dynamic types returns IntType.getFixedSize()
-     * which is effectively the int offset to dynamic data
+     * Returns the fixed size in bytes. For the dynamic types returns IntType.getFixedSize(),
+     * which is effectively the int offset to dynamic data.
      */
     public int getFixedSize() {
         return Int32Size;
