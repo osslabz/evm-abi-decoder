@@ -246,7 +246,7 @@ public abstract class SolidityType {
             if (value instanceof byte[]) {
                 bb = (byte[]) value;
             } else if (value instanceof String) {
-                bb = ((String) value).getBytes();
+                bb = ((String) value).getBytes(StandardCharsets.UTF_8);
             } else {
                 throw new RuntimeException("byte[] or String value is expected for type 'bytes'");
             }

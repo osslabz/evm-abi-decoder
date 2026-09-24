@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.util.StdConverter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -210,7 +211,7 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
         }
 
         public byte[] fingerprintSignature() {
-            return HashUtil.hashAsKeccak(formatSignature().getBytes());
+            return HashUtil.hashAsKeccak(formatSignature().getBytes(StandardCharsets.UTF_8));
         }
 
         public byte[] encodeSignature() {
