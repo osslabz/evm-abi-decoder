@@ -36,7 +36,6 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
             .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL);
 
     public static class ParamSanitizer extends StdConverter<Entry.Param, Entry.Param> {
-        public ParamSanitizer() {}
 
         @Override
         public Entry.Param convert(Entry.Param param) {
