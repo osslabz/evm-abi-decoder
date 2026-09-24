@@ -432,7 +432,7 @@ public abstract class SolidityType {
 
         @Override
         public String getCanonicalName() {
-            if (getName().equals("int")) {
+            if ("int".equals(getName())) {
                 return "int256";
             }
             return super.getCanonicalName();
@@ -472,7 +472,7 @@ public abstract class SolidityType {
 
         @Override
         public String getCanonicalName() {
-            if (getName().equals("uint")) {
+            if ("uint".equals(getName())) {
                 return "uint256";
             }
             return super.getCanonicalName();
