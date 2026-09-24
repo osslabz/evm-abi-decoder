@@ -205,8 +205,9 @@ public abstract class SolidityType {
 
         @Override
         public byte[] encodeList(List l) {
-            if (l.size() != size)
+            if (l.size() != size) {
                 throw new RuntimeException("List size (" + l.size() + ") != " + size + " for type " + getName());
+            }
             return encodeTuple(l);
         }
 
@@ -285,7 +286,9 @@ public abstract class SolidityType {
         @Override
         public Object decode(byte[] encoded, int offset) {
             int len = IntType.decodeInt(encoded, offset).intValue();
-            if (len == 0) return new byte[0];
+            if (len == 0) {
+                return new byte[0];
+            }
             offset += Int32Size;
             return Arrays.copyOfRange(encoded, offset, offset + len);
         }
@@ -303,7 +306,9 @@ public abstract class SolidityType {
 
         @Override
         public byte[] encode(Object value) {
-            if (!(value instanceof String)) throw new RuntimeException("String value expected for type 'string'");
+            if (!(value instanceof String)) {
+                throw new RuntimeException("String value expected for type 'string'");
+            }
             return super.encode(((String) value).getBytes(StandardCharsets.UTF_8));
         }
 
@@ -427,7 +432,9 @@ public abstract class SolidityType {
 
         @Override
         public String getCanonicalName() {
-            if (getName().equals("int")) return "int256";
+            if (getName().equals("int")) {
+                return "int256";
+            }
             return super.getCanonicalName();
         }
 
@@ -465,7 +472,9 @@ public abstract class SolidityType {
 
         @Override
         public String getCanonicalName() {
-            if (getName().equals("uint")) return "uint256";
+            if (getName().equals("uint")) {
+                return "uint256";
+            }
             return super.getCanonicalName();
         }
 
@@ -488,7 +497,9 @@ public abstract class SolidityType {
 
         @Override
         public byte[] encode(Object value) {
-            if (!(value instanceof Boolean)) throw new RuntimeException("Wrong value for bool type: " + value);
+            if (!(value instanceof Boolean)) {
+                throw new RuntimeException("Wrong value for bool type: " + value);
+            }
             return super.encode((Boolean) value ? 1 : 0);
         }
 
@@ -557,8 +568,12 @@ public abstract class SolidityType {
 
         @Override
         public byte[] encode(Object value) {
-            if (!(value instanceof byte[])) throw new RuntimeException("Expected byte[] value for FunctionType");
-            if (((byte[]) value).length != 24) throw new RuntimeException("Expected byte[24] for FunctionType");
+            if (!(value instanceof byte[])) {
+                throw new RuntimeException("Expected byte[] value for FunctionType");
+            }
+            if (((byte[]) value).length != 24) {
+                throw new RuntimeException("Expected byte[24] for FunctionType");
+            }
             return super.encode(ByteUtil.merge((byte[]) value, new byte[8]));
         }
     }

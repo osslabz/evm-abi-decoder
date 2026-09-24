@@ -294,8 +294,9 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
         }
 
         private byte[] encodeArguments(Object... args) {
-            if (args.length > inputs.size())
+            if (args.length > inputs.size()) {
                 throw new RuntimeException("Too many arguments: " + args.length + " > " + inputs.size());
+            }
 
             int staticSize = 0;
             int dynamicCnt = 0;
