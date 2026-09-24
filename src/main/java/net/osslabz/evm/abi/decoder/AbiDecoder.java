@@ -17,7 +17,10 @@ import org.bouncycastle.util.encoders.Hex;
 @Getter
 public class AbiDecoder {
 
+    // Public API: AbiDefinition, a list implementation, is the type of the abi field and getAbi().
+    @SuppressWarnings("PMD.LooseCoupling")
     protected final AbiDefinition abi;
+
     protected final Map<String, AbiDefinition.Entry> methodSignatures = new HashMap<>();
 
     public AbiDecoder(String abiFilePath) throws IOException {
@@ -28,6 +31,8 @@ public class AbiDecoder {
         this(AbiDefinition.fromJson(inputStream));
     }
 
+    // Public API: AbiDefinition, a list implementation, is the type of the abi field and getAbi().
+    @SuppressWarnings("PMD.LooseCoupling")
     private AbiDecoder(AbiDefinition abi) {
         this.abi = abi;
         for (AbiDefinition.Entry entry : this.abi) {
@@ -36,6 +41,8 @@ public class AbiDecoder {
         }
     }
 
+    // Public API: AbiDefinition, a list implementation, is the type of the abi field and getAbi().
+    @SuppressWarnings("PMD.LooseCoupling")
     private static AbiDefinition readAbi(String abiFilePath) throws IOException {
         return AbiDefinition.fromJson(new String(Files.readAllBytes(Paths.get(abiFilePath)), StandardCharsets.UTF_8));
     }
@@ -73,6 +80,8 @@ public class AbiDecoder {
         return new DecodedFunctionCall(abiFunction.name, params);
     }
 
+    // Public API: a plain call has always come back as an immutable list, a multicall as a mutable one.
+    @SuppressWarnings("MixedMutabilityReturnType")
     public List<DecodedFunctionCall> decodeFunctionsCalls(String inputData) {
 
         DecodedFunctionCall decodedFunctionCall = this.decodeFunctionCall(inputData);

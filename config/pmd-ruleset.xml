@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="quality-gates"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <description>PMD quickstart, minus rules that conflict with deliberate project decisions,
+        plus two rules the quickstart set leaves out.</description>
+
+    <rule ref="rulesets/java/quickstart.xml">
+        <!-- SLF4J parameterized logging is the project style, and the call sites this rule
+             flags pass cheap arguments - a collection size, an enum, a config getter, an
+             exception's message. Guarding them with isXxxEnabled() would double each log
+             site for nothing. -->
+        <exclude name="GuardLogStatement"/>
+    </rule>
+
+    <!-- Parameterized SLF4J calls are everywhere and a placeholder that does not match its
+         arguments compiles, runs and silently corrupts the operator-facing line. No other
+         gate looks at it. -->
+    <rule ref="category/java/errorprone.xml/InvalidLogMessageFormat"/>
+    <!-- Keeps the PMD suppressions in the main sources honest: a @SuppressWarnings that no
+         longer suppresses anything fails the build instead of quietly outliving the code it
+         was written for. -->
+    <rule ref="category/java/bestpractices.xml/UnnecessaryWarningSuppression"/>
+
+</ruleset>

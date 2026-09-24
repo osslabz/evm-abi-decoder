@@ -21,6 +21,8 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import org.bouncycastle.util.encoders.Hex;
 
+// Public API: a private constructor would remove the public one callers may use.
+@SuppressWarnings("PMD.InstantiableUtilityClass")
 public class ByteUtil {
 
     /**
@@ -51,6 +53,8 @@ public class ByteUtil {
      * @return A byte array without a leading zero byte if present in the signed encoding.
      * BigInteger.ZERO will return an array with length 1 and byte-value 0.
      */
+    // Public API: callers get null back for a null value.
+    @SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
     public static byte[] bigIntegerToBytes(BigInteger value) {
         if (value == null) {
             return null;
@@ -74,6 +78,8 @@ public class ByteUtil {
      * @param numBytes the desired size of the resulting byte array
      * @return numBytes byte long array.
      */
+    // Public API: callers get null back for a null value.
+    @SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
     public static byte[] bigIntegerToBytes(BigInteger b, int numBytes) {
         if (b == null) {
             return null;
@@ -86,6 +92,8 @@ public class ByteUtil {
         return bytes;
     }
 
+    // Public API: callers get null back for a null value.
+    @SuppressWarnings("PMD.ReturnEmptyCollectionRatherThanNull")
     public static byte[] bigIntegerToBytesSigned(BigInteger b, int numBytes) {
         if (b == null) {
             return null;

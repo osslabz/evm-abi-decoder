@@ -57,6 +57,8 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
         }
     }
 
+    // Public API: the fromJson factories return this list implementation.
+    @SuppressWarnings("PMD.LooseCoupling")
     public static AbiDefinition fromJson(String json) {
         try {
             return DEFAULT_MAPPER.readValue(json, AbiDefinition.class);
@@ -65,6 +67,8 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
         }
     }
 
+    // Public API: the fromJson factories return this list implementation.
+    @SuppressWarnings("PMD.LooseCoupling")
     public static AbiDefinition fromJson(Reader reader) {
         try {
             return DEFAULT_MAPPER.readValue(reader, AbiDefinition.class);
@@ -73,6 +77,8 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
         }
     }
 
+    // Public API: the fromJson factories return this list implementation.
+    @SuppressWarnings("PMD.LooseCoupling")
     public static AbiDefinition fromJson(InputStream inputStream) {
         try {
             return DEFAULT_MAPPER.readValue(inputStream, AbiDefinition.class);
@@ -398,6 +404,8 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
         }
     }
 
+    // Public API: the Solidity term, and renaming the class would break every caller of findError.
+    @SuppressWarnings("AvoidCommonTypeNames")
     public static class Error extends Entry {
         public Error(String name, List<Param> inputs) {
             super(null, null, name, inputs, null, Type.error, false);

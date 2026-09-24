@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!-- Metrics-only profile. Formatting is owned by Spotless (palantir-java-format), bug
+     patterns by Error Prone and SpotBugs - none of that is duplicated here.
+
+     Every limit is the shared default the other codelabz projects ratchet towards, and this
+     codebase already clears all of them. Never raise one to make a build pass. -->
+<module name="Checker">
+    <module name="TreeWalker">
+        <module name="CyclomaticComplexity">
+            <property name="max" value="10"/>
+        </module>
+        <module name="NPathComplexity">
+            <property name="max" value="200"/>
+        </module>
+        <module name="BooleanExpressionComplexity">
+            <property name="max" value="4"/>
+        </module>
+        <module name="JavaNCSS">
+            <property name="methodMaximum" value="50"/>
+        </module>
+        <module name="MethodLength">
+            <property name="max" value="150"/>
+        </module>
+        <!-- Methods only: constructor arity mirrors structure (DI wiring, record
+             convenience constructors), not logic complexity. -->
+        <module name="ParameterNumber">
+            <property name="max" value="7"/>
+            <property name="tokens" value="METHOD_DEF"/>
+        </module>
+        <module name="ClassFanOutComplexity">
+            <property name="max" value="20"/>
+        </module>
+    </module>
+</module>
