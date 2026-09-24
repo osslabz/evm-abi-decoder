@@ -75,48 +75,39 @@ public class AbiDecoder {
 
         DecodedFunctionCall decodedFunctionCall = this.decodeFunctionCall(inputData);
 
-        List<DecodedFunctionCall> resolvedCalls = Collections.singletonList(decodedFunctionCall);
+        if (!"multicall".equalsIgnoreCase(decodedFunctionCall.getName())) {
+            return Collections.singletonList(decodedFunctionCall);
+        }
 
-        if (decodedFunctionCall.getName().equalsIgnoreCase("multicall")) {
+        DecodedFunctionCall.Param multiCallPayloadData = decodedFunctionCall.getParam("data");
 
-            DecodedFunctionCall.Param multiCallPayloadData = decodedFunctionCall.getParam("data");
+        if (multiCallPayloadData == null) {
+            throw new IllegalStateException("multicall function call doesn't contain expected data input param.");
+        }
 
-            if (multiCallPayloadData == null) {
-                throw new IllegalStateException("multicall function call doesn't contain expected data input param.");
+        List<DecodedFunctionCall> resolvedCalls = new ArrayList<>();
+        Object paramValue = multiCallPayloadData.getValue();
+
+        if (paramValue instanceof Object[]) {
+            for (Object singleCallInputData : (Object[]) paramValue) {
+                resolvedCalls.add(this.decodeMultiCallEntry(singleCallInputData, multiCallPayloadData));
             }
-
-            resolvedCalls = new ArrayList<>();
-            Object paramValue = multiCallPayloadData.getValue();
-
-            if (paramValue instanceof String) {
-                resolvedCalls.add(this.decodeFunctionCall((String) paramValue));
-            } else if (paramValue instanceof byte[]) {
-                resolvedCalls.add(this.decodeFunctionCall(Hex.toHexString((byte[]) paramValue)));
-            } else if (paramValue instanceof Object[]) {
-                for (Object singleCallInputData : (Object[]) paramValue) {
-                    if (singleCallInputData instanceof String) {
-                        DecodedFunctionCall call = this.decodeFunctionCall((String) singleCallInputData);
-                        if (call != null) {
-                            resolvedCalls.add(call);
-                        }
-                    } else if (singleCallInputData instanceof byte[]) {
-                        DecodedFunctionCall call =
-                                this.decodeFunctionCall(Hex.toHexString((byte[]) singleCallInputData));
-                        if (call != null) {
-                            resolvedCalls.add(call);
-                        }
-                    } else {
-                        throw new IllegalStateException("Can't decode param name=" + multiCallPayloadData.getName()
-                                + ", type=" + multiCallPayloadData.getType() + ", value="
-                                + multiCallPayloadData.getValue());
-                    }
-                }
-            } else {
-                throw new IllegalStateException("Can't decode param name=" + multiCallPayloadData.getName() + ", type="
-                        + multiCallPayloadData.getType() + ", value=" + multiCallPayloadData.getValue());
-            }
+        } else {
+            resolvedCalls.add(this.decodeMultiCallEntry(paramValue, multiCallPayloadData));
         }
         return resolvedCalls;
+    }
+
+    private DecodedFunctionCall decodeMultiCallEntry(
+            Object callInputData, DecodedFunctionCall.Param multiCallPayloadData) {
+        if (callInputData instanceof String) {
+            return this.decodeFunctionCall((String) callInputData);
+        }
+        if (callInputData instanceof byte[]) {
+            return this.decodeFunctionCall(Hex.toHexString((byte[]) callInputData));
+        }
+        throw new IllegalStateException("Can't decode param name=" + multiCallPayloadData.getName() + ", type="
+                + multiCallPayloadData.getType() + ", value=" + multiCallPayloadData.getValue());
     }
 
     public DecodedFunctionCall decodeLogEvent(List<String> topics, String data) {

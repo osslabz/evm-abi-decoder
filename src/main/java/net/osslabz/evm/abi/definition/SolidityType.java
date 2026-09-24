@@ -7,13 +7,21 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.function.Supplier;
 import lombok.Getter;
 import net.osslabz.evm.abi.util.ByteUtil;
+import org.apache.commons.lang3.StringUtils;
 
 public abstract class SolidityType {
     private static final int Int32Size = 32;
+
+    // Exact type names. A supplier each, since a tuple type is mutable and every lookup needs its own.
+    private static final Map<String, Supplier<SolidityType>> NAMED_TYPES = namedTypes();
     /**
      * -- GETTER --
      *  The type name as it was specified in the interface description
@@ -26,17 +34,34 @@ public abstract class SolidityType {
 
     @JsonCreator
     public static SolidityType getType(String typeName) {
-        if (typeName.endsWith("]")) return ArrayType.getType(typeName);
-        if ("bool".equals(typeName)) return new BoolType();
-        if (typeName.startsWith("int")) return new IntType(typeName);
-        if (typeName.startsWith("uint")) return new UnsignedIntType(typeName);
-        if ("address".equals(typeName)) return new AddressType();
-        if ("string".equals(typeName)) return new StringType();
-        if ("bytes".equals(typeName)) return new BytesType();
-        if ("function".equals(typeName)) return new FunctionType();
-        if ("tuple".equals(typeName)) return new TupleType();
-        if (typeName.startsWith("bytes")) return new Bytes32Type(typeName);
+        if (typeName.endsWith("]")) {
+            return ArrayType.getType(typeName);
+        }
+        Supplier<SolidityType> namedType = NAMED_TYPES.get(typeName);
+        if (namedType != null) {
+            return namedType.get();
+        }
+        if (typeName.startsWith("int")) {
+            return new IntType(typeName);
+        }
+        if (typeName.startsWith("uint")) {
+            return new UnsignedIntType(typeName);
+        }
+        if (typeName.startsWith("bytes")) {
+            return new Bytes32Type(typeName);
+        }
         throw new RuntimeException("Unknown type: " + typeName);
+    }
+
+    private static Map<String, Supplier<SolidityType>> namedTypes() {
+        Map<String, Supplier<SolidityType>> types = new HashMap<>();
+        types.put("bool", BoolType::new);
+        types.put("address", AddressType::new);
+        types.put("string", StringType::new);
+        types.put("bytes", BytesType::new);
+        types.put("function", FunctionType::new);
+        types.put("tuple", TupleType::new);
+        return Collections.unmodifiableMap(types);
     }
 
     /**
@@ -359,20 +384,7 @@ public abstract class SolidityType {
         BigInteger encodeInternal(Object value) {
             BigInteger bigInt;
             if (value instanceof String) {
-                String s = ((String) value).toLowerCase(Locale.ROOT).trim();
-                int radix = 10;
-                if (s.startsWith("0x")) {
-                    s = s.substring(2);
-                    radix = 16;
-                } else if (s.contains("a")
-                        || s.contains("b")
-                        || s.contains("c")
-                        || s.contains("d")
-                        || s.contains("e")
-                        || s.contains("f")) {
-                    radix = 16;
-                }
-                bigInt = new BigInteger(s, radix);
+                bigInt = parseInteger((String) value);
             } else if (value instanceof BigInteger) {
                 bigInt = (BigInteger) value;
             } else if (value instanceof Number) {
@@ -384,6 +396,15 @@ public abstract class SolidityType {
                         "Invalid value for type '" + this + "': " + value + " (" + value.getClass() + ")");
             }
             return bigInt;
+        }
+
+        // Hex with a 0x prefix, or without one when a hex letter shows up; decimal otherwise.
+        private static BigInteger parseInteger(String value) {
+            String s = value.toLowerCase(Locale.ROOT).trim();
+            if (s.startsWith("0x")) {
+                return new BigInteger(s.substring(2), 16);
+            }
+            return new BigInteger(s, StringUtils.containsAny(s, "abcdef") ? 16 : 10);
         }
     }
 
