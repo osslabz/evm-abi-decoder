@@ -468,7 +468,7 @@ public abstract class SolidityType {
         @Override
         public byte[] encode(Object value) {
             if (!(value instanceof Boolean)) throw new RuntimeException("Wrong value for bool type: " + value);
-            return super.encode(value == Boolean.TRUE ? 1 : 0);
+            return super.encode((Boolean) value ? 1 : 0);
         }
 
         @Override
