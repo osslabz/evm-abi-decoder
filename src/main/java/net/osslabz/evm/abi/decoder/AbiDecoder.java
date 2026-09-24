@@ -21,21 +21,23 @@ public class AbiDecoder {
     protected final Map<String, AbiDefinition.Entry> methodSignatures = new HashMap<>();
 
     public AbiDecoder(String abiFilePath) throws IOException {
-        this.abi =
-                AbiDefinition.fromJson(new String(Files.readAllBytes(Paths.get(abiFilePath)), StandardCharsets.UTF_8));
-        init();
+        this(readAbi(abiFilePath));
     }
 
     public AbiDecoder(InputStream inputStream) {
-        this.abi = AbiDefinition.fromJson(inputStream);
-        init();
+        this(AbiDefinition.fromJson(inputStream));
     }
 
-    private void init() {
+    private AbiDecoder(AbiDefinition abi) {
+        this.abi = abi;
         for (AbiDefinition.Entry entry : this.abi) {
             String hexEncodedMethodSignature = Hex.toHexString(entry.encodeSignature());
             this.methodSignatures.put(hexEncodedMethodSignature, entry);
         }
+    }
+
+    private static AbiDefinition readAbi(String abiFilePath) throws IOException {
+        return AbiDefinition.fromJson(new String(Files.readAllBytes(Paths.get(abiFilePath)), StandardCharsets.UTF_8));
     }
 
     public DecodedFunctionCall decodeFunctionCall(String inputData) {
