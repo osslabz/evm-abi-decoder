@@ -1,9 +1,5 @@
 package net.osslabz.evm.abi.decoder;
 
-import lombok.Getter;
-import net.osslabz.evm.abi.definition.AbiDefinition;
-import org.bouncycastle.util.encoders.Hex;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -14,6 +10,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.Getter;
+import net.osslabz.evm.abi.definition.AbiDefinition;
+import org.bouncycastle.util.encoders.Hex;
 
 @Getter
 public class AbiDecoder {
@@ -22,7 +21,8 @@ public class AbiDecoder {
     protected final Map<String, AbiDefinition.Entry> methodSignatures = new HashMap<>();
 
     public AbiDecoder(String abiFilePath) throws IOException {
-        this.abi = AbiDefinition.fromJson(new String(Files.readAllBytes(Paths.get(abiFilePath)), StandardCharsets.UTF_8));
+        this.abi =
+                AbiDefinition.fromJson(new String(Files.readAllBytes(Paths.get(abiFilePath)), StandardCharsets.UTF_8));
         init();
     }
 
@@ -47,13 +47,14 @@ public class AbiDecoder {
         String methodBytes = inputNoPrefix.substring(0, 8);
 
         if (!this.methodSignatures.containsKey(methodBytes)) {
-            //return null;
+            // return null;
             throw new IllegalStateException("Couldn't find method with signature " + methodBytes);
         }
         AbiDefinition.Entry abiEntry = this.methodSignatures.get(methodBytes);
 
         if (!(abiEntry instanceof AbiDefinition.Function)) {
-            throw new IllegalArgumentException("Input data is not a function call, it's of type '" + abiEntry.type + "'.");
+            throw new IllegalArgumentException(
+                    "Input data is not a function call, it's of type '" + abiEntry.type + "'.");
         }
 
         AbiDefinition.Function abiFunction = (AbiDefinition.Function) abiEntry;
@@ -63,7 +64,8 @@ public class AbiDecoder {
 
         for (int i = 0; i < decoded.size(); i++) {
             AbiDefinition.Entry.Param paramDefinition = abiFunction.inputs.get(i);
-            DecodedFunctionCall.Param param = new DecodedFunctionCall.Param(paramDefinition.getName(), paramDefinition.getType().getName(), decoded.get(i));
+            DecodedFunctionCall.Param param = new DecodedFunctionCall.Param(
+                    paramDefinition.getName(), paramDefinition.getType().getName(), decoded.get(i));
             params.add(param);
         }
         return new DecodedFunctionCall(abiFunction.name, params);
@@ -98,21 +100,24 @@ public class AbiDecoder {
                             resolvedCalls.add(call);
                         }
                     } else if (singleCallInputData instanceof byte[]) {
-                        DecodedFunctionCall call = this.decodeFunctionCall(Hex.toHexString((byte[]) singleCallInputData));
+                        DecodedFunctionCall call =
+                                this.decodeFunctionCall(Hex.toHexString((byte[]) singleCallInputData));
                         if (call != null) {
                             resolvedCalls.add(call);
                         }
                     } else {
-                        throw new IllegalStateException("Can't decode param name=" + multiCallPayloadData.getName() + ", type=" + multiCallPayloadData.getType() + ", value=" + multiCallPayloadData.getValue());
+                        throw new IllegalStateException("Can't decode param name=" + multiCallPayloadData.getName()
+                                + ", type=" + multiCallPayloadData.getType() + ", value="
+                                + multiCallPayloadData.getValue());
                     }
                 }
             } else {
-                throw new IllegalStateException("Can't decode param name=" + multiCallPayloadData.getName() + ", type=" + multiCallPayloadData.getType() + ", value=" + multiCallPayloadData.getValue());
+                throw new IllegalStateException("Can't decode param name=" + multiCallPayloadData.getName() + ", type="
+                        + multiCallPayloadData.getType() + ", value=" + multiCallPayloadData.getValue());
             }
         }
         return resolvedCalls;
     }
-
 
     public DecodedFunctionCall decodeLogEvent(List<String> topics, String data) {
         if (topics.isEmpty()) {
@@ -125,15 +130,14 @@ public class AbiDecoder {
         } else {
             if (abiEntry instanceof AbiDefinition.Event) {
                 AbiDefinition.Event abiEvent = (AbiDefinition.Event) abiEntry;
-                List<?> decoded = abiEvent.decode(hexBytes(data), topics
-                        .stream()
-                        .map(AbiDecoder::hexBytes)
-                        .toArray(byte[][]::new));
+                List<?> decoded = abiEvent.decode(
+                        hexBytes(data),
+                        topics.stream().map(AbiDecoder::hexBytes).toArray(byte[][]::new));
                 List<DecodedFunctionCall.Param> params = new ArrayList<>(abiEvent.inputs.size());
                 for (int i = 0; i < decoded.size(); i++) {
                     AbiDefinition.Entry.Param paramDefinition = abiEvent.inputs.get(i);
-                    DecodedFunctionCall.Param param = new DecodedFunctionCall.Param(paramDefinition.getName(), paramDefinition.getType()
-                            .getName(), decoded.get(i));
+                    DecodedFunctionCall.Param param = new DecodedFunctionCall.Param(
+                            paramDefinition.getName(), paramDefinition.getType().getName(), decoded.get(i));
                     params.add(param);
                 }
                 return new DecodedFunctionCall(abiEvent.name, params);

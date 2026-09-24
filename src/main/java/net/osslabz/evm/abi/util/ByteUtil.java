@@ -17,13 +17,11 @@
  */
 package net.osslabz.evm.abi.util;
 
-import org.bouncycastle.util.encoders.Hex;
-
 import java.math.BigInteger;
 import java.util.Arrays;
+import org.bouncycastle.util.encoders.Hex;
 
 public class ByteUtil {
-
 
     /**
      * Convert a byte-array into a hex String.<br>
@@ -43,7 +41,6 @@ public class ByteUtil {
         return (bb == null || bb.length == 0) ? BigInteger.ZERO : new BigInteger(1, bb);
     }
 
-
     /**
      * Omitting sign indication byte.
      * <br><br>
@@ -55,8 +52,7 @@ public class ByteUtil {
      * BigInteger.ZERO will return an array with length 1 and byte-value 0.
      */
     public static byte[] bigIntegerToBytes(BigInteger value) {
-        if (value == null)
-            return null;
+        if (value == null) return null;
 
         byte[] data = value.toByteArray();
 
@@ -77,8 +73,7 @@ public class ByteUtil {
      * @return numBytes byte long array.
      */
     public static byte[] bigIntegerToBytes(BigInteger b, int numBytes) {
-        if (b == null)
-            return null;
+        if (b == null) return null;
         byte[] bytes = new byte[numBytes];
         byte[] biBytes = b.toByteArray();
         int start = (biBytes.length == numBytes + 1) ? 1 : 0;
@@ -87,10 +82,8 @@ public class ByteUtil {
         return bytes;
     }
 
-
     public static byte[] bigIntegerToBytesSigned(BigInteger b, int numBytes) {
-        if (b == null)
-            return null;
+        if (b == null) return null;
         byte[] bytes = new byte[numBytes];
         Arrays.fill(bytes, b.signum() < 0 ? (byte) 0xFF : 0x00);
         byte[] biBytes = b.toByteArray();
@@ -99,7 +92,6 @@ public class ByteUtil {
         System.arraycopy(biBytes, start, bytes, numBytes - length, length);
         return bytes;
     }
-
 
     /**
      * @param arrays - arrays to merge

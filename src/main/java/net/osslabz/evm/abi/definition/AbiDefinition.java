@@ -1,27 +1,5 @@
 package net.osslabz.evm.abi.definition;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.util.StdConverter;
-import lombok.Data;
-import net.osslabz.evm.abi.util.ByteUtil;
-import net.osslabz.evm.abi.util.HashUtil;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.lang3.StringUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import static com.fasterxml.jackson.annotation.JsonInclude.Include;
 import static java.lang.String.format;
 import static net.osslabz.evm.abi.definition.SolidityType.IntType.decodeInt;
@@ -30,14 +8,34 @@ import static org.apache.commons.lang3.ArrayUtils.subarray;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.stripEnd;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.util.StdConverter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import lombok.Data;
+import net.osslabz.evm.abi.util.ByteUtil;
+import net.osslabz.evm.abi.util.HashUtil;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.lang3.StringUtils;
+
 public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
-    private final static ObjectMapper DEFAULT_MAPPER = new ObjectMapper()
+    private static final ObjectMapper DEFAULT_MAPPER = new ObjectMapper()
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             .enable(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL);
 
     public static class ParamSanitizer extends StdConverter<Entry.Param, Entry.Param> {
-        public ParamSanitizer() {
-        }
+        public ParamSanitizer() {}
 
         @Override
         public Entry.Param convert(Entry.Param param) {
@@ -49,7 +47,9 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
                 SolidityType.ArrayType arrayType = (SolidityType.ArrayType) param.type;
                 if (arrayType.elementType instanceof SolidityType.TupleType) {
                     for (AbiDefinition.Entry.Param c : param.components) {
-                        ((SolidityType.TupleType) arrayType.elementType).getTypes().add(c.getType());
+                        ((SolidityType.TupleType) arrayType.elementType)
+                                .getTypes()
+                                .add(c.getType());
                     }
                 }
             }
@@ -114,9 +114,8 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
         return toJson();
     }
 
-
     @JsonInclude(Include.NON_NULL)
-    public static abstract class Entry {
+    public abstract static class Entry {
 
         public final Boolean anonymous;
         public final Boolean constant;
@@ -126,7 +125,14 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
         public final Type type;
         public final Boolean payable;
 
-        public Entry(Boolean anonymous, Boolean constant, String name, List<Param> inputs, List<Param> outputs, Type type, Boolean payable) {
+        public Entry(
+                Boolean anonymous,
+                Boolean constant,
+                String name,
+                List<Param> inputs,
+                List<Param> outputs,
+                Type type,
+                Boolean payable) {
             this.anonymous = anonymous;
             this.constant = constant;
             this.name = name;
@@ -137,13 +143,14 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
         }
 
         @JsonCreator
-        public static Entry create(@JsonProperty("anonymous") boolean anonymous,
-                                   @JsonProperty("constant") boolean constant,
-                                   @JsonProperty("name") String name,
-                                   @JsonProperty("inputs") List<Param> inputs,
-                                   @JsonProperty("outputs") List<Param> outputs,
-                                   @JsonProperty("type") Type type,
-                                   @JsonProperty(value = "payable", required = false, defaultValue = "false") Boolean payable) {
+        public static Entry create(
+                @JsonProperty("anonymous") boolean anonymous,
+                @JsonProperty("constant") boolean constant,
+                @JsonProperty("name") String name,
+                @JsonProperty("inputs") List<Param> inputs,
+                @JsonProperty("outputs") List<Param> outputs,
+                @JsonProperty("type") Type type,
+                @JsonProperty(value = "payable", required = false, defaultValue = "false") Boolean payable) {
             Entry result = null;
             switch (type) {
                 case constructor:
@@ -182,9 +189,22 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
         public String formatParamSignature(Param param) {
             String type = param.type.getCanonicalName();
             if (param.type instanceof SolidityType.TupleType) {
-                type = "(" + StringUtils.join(param.getComponents().stream().map(this::formatParamSignature).collect(Collectors.toList()), ",") + ")";
-            } else if (param.type instanceof SolidityType.ArrayType && ((SolidityType.ArrayType)param.type).elementType instanceof SolidityType.TupleType) {
-                type = "(" + StringUtils.join(param.getComponents().stream().map(this::formatParamSignature).collect(Collectors.toList()), ",") + ")[]";
+                type = "("
+                        + StringUtils.join(
+                                param.getComponents().stream()
+                                        .map(this::formatParamSignature)
+                                        .collect(Collectors.toList()),
+                                ",")
+                        + ")";
+            } else if (param.type instanceof SolidityType.ArrayType
+                    && ((SolidityType.ArrayType) param.type).elementType instanceof SolidityType.TupleType) {
+                type = "("
+                        + StringUtils.join(
+                                param.getComponents().stream()
+                                        .map(this::formatParamSignature)
+                                        .collect(Collectors.toList()),
+                                ",")
+                        + ")[]";
             }
             return type;
         }
@@ -208,7 +228,7 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
 
         @Data
         @JsonInclude(Include.NON_NULL)
-        @JsonDeserialize(converter = ParamSanitizer.class)  // invoked after class is fully deserialized
+        @JsonDeserialize(converter = ParamSanitizer.class) // invoked after class is fully deserialized
         public static class Param {
             private Boolean indexed;
             private String name;
@@ -222,7 +242,8 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
                 int offset = 0;
                 for (Param param : params) {
                     Object decoded = param.type.isDynamicType()
-                            ? param.type.decode(encoded, decodeInt(encoded, offset).intValue())
+                            ? param.type.decode(
+                                    encoded, decodeInt(encoded, offset).intValue())
                             : param.type.decode(encoded, offset);
                     result.add(decoded);
 
@@ -234,7 +255,8 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
 
             @Override
             public String toString() {
-                return format("%s%s%s", type.getCanonicalName(), (indexed != null && indexed) ? " indexed " : " ", name);
+                return format(
+                        "%s%s%s", type.getCanonicalName(), (indexed != null && indexed) ? " indexed " : " ", name);
             }
         }
     }

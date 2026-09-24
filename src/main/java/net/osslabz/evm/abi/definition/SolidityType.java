@@ -2,19 +2,17 @@ package net.osslabz.evm.abi.definition;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import lombok.Getter;
-import net.osslabz.evm.abi.util.ByteUtil;
-
 import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+import lombok.Getter;
+import net.osslabz.evm.abi.util.ByteUtil;
 
 public abstract class SolidityType {
-    private final static int Int32Size = 32;
+    private static final int Int32Size = 32;
     /**
      * -- GETTER --
      *  The type name as it was specified in the interface description
@@ -86,8 +84,7 @@ public abstract class SolidityType {
         return getName();
     }
 
-
-    public static abstract class ArrayType extends SolidityType {
+    public abstract static class ArrayType extends SolidityType {
         SolidityType elementType;
 
         public ArrayType(String name) {
@@ -146,7 +143,9 @@ public abstract class SolidityType {
 
             for (int i = 0; i < len; i++) {
                 if (elementType.isDynamicType()) {
-                    ret[i] = elementType.decode(encoded, origOffset + IntType.decodeInt(encoded, offset).intValue());
+                    ret[i] = elementType.decode(
+                            encoded,
+                            origOffset + IntType.decodeInt(encoded, offset).intValue());
                 } else {
                     ret[i] = elementType.decode(encoded, offset);
                 }
@@ -154,7 +153,6 @@ public abstract class SolidityType {
             }
             return ret;
         }
-
 
         public SolidityType getElementType() {
             return elementType;
@@ -338,7 +336,8 @@ public abstract class SolidityType {
             byte[] addr = super.encode(value);
             for (int i = 0; i < 12; i++) {
                 if (addr[i] != 0) {
-                    throw new RuntimeException("Invalid address (should be 20 bytes length): " + ByteUtil.toHexString(addr));
+                    throw new RuntimeException(
+                            "Invalid address (should be 20 bytes length): " + ByteUtil.toHexString(addr));
                 }
             }
             return addr;
@@ -351,7 +350,7 @@ public abstract class SolidityType {
         }
     }
 
-    public static abstract class NumericType extends SolidityType {
+    public abstract static class NumericType extends SolidityType {
         public NumericType(String name) {
             super(name);
         }
@@ -364,8 +363,12 @@ public abstract class SolidityType {
                 if (s.startsWith("0x")) {
                     s = s.substring(2);
                     radix = 16;
-                } else if (s.contains("a") || s.contains("b") || s.contains("c") ||
-                        s.contains("d") || s.contains("e") || s.contains("f")) {
+                } else if (s.contains("a")
+                        || s.contains("b")
+                        || s.contains("c")
+                        || s.contains("d")
+                        || s.contains("e")
+                        || s.contains("f")) {
                     radix = 16;
                 }
                 bigInt = new BigInteger(s, radix);
@@ -376,7 +379,8 @@ public abstract class SolidityType {
             } else if (value instanceof byte[]) {
                 bigInt = ByteUtil.bytesToBigInteger((byte[]) value);
             } else {
-                throw new RuntimeException("Invalid value for type '" + this + "': " + value + " (" + value.getClass() + ")");
+                throw new RuntimeException(
+                        "Invalid value for type '" + this + "': " + value + " (" + value.getClass() + ")");
             }
             return bigInt;
         }
@@ -495,7 +499,7 @@ public abstract class SolidityType {
             }
         }
 
-        private boolean containsDynamicTypes(){
+        private boolean containsDynamicTypes() {
             return types.stream().anyMatch(SolidityType::isDynamicType);
         }
 
@@ -512,7 +516,9 @@ public abstract class SolidityType {
             for (int i = 0; i < types.size(); i++) {
                 SolidityType elementType = types.get(i);
                 if (elementType.isDynamicType()) {
-                    ret[i] = elementType.decode(encoded, origOffset + IntType.decodeInt(encoded, offset).intValue());
+                    ret[i] = elementType.decode(
+                            encoded,
+                            origOffset + IntType.decodeInt(encoded, offset).intValue());
                 } else {
                     ret[i] = elementType.decode(encoded, offset);
                 }
