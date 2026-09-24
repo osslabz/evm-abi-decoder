@@ -90,24 +90,24 @@ public class AbiDefinition extends ArrayList<AbiDefinition.Entry> {
         }
     }
 
-    private <T extends Entry> T find(Class<T> resultClass, final Entry.Type type, final Predicate<T> searchPredicate) {
+    private <T extends Entry> T find(final Entry.Type type, final Predicate<T> searchPredicate) {
         return (T) CollectionUtils.find(this, entry -> entry.type == type && searchPredicate.evaluate((T) entry));
     }
 
     public Function findFunction(Predicate<Function> searchPredicate) {
-        return find(Function.class, Entry.Type.function, searchPredicate);
+        return find(Entry.Type.function, searchPredicate);
     }
 
     public Event findEvent(Predicate<Event> searchPredicate) {
-        return find(Event.class, Entry.Type.event, searchPredicate);
+        return find(Entry.Type.event, searchPredicate);
     }
 
     public Error findError(Predicate<Error> searchError) {
-        return find(Error.class, Entry.Type.error, searchError);
+        return find(Entry.Type.error, searchError);
     }
 
     public Constructor findConstructor() {
-        return find(Constructor.class, Entry.Type.constructor, object -> true);
+        return find(Entry.Type.constructor, object -> true);
     }
 
     @Override
