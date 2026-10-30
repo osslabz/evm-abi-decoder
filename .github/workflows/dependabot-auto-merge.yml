@@ -1,9 +1,15 @@
 name: dependabot-auto-merge
 
+# Runs when a Dependabot branch's build-on-push run ends; the shared workflow merges the pull
+# request if that build went green. Only fires from the default branch's copy of this file.
 on:
-  pull_request:
+  workflow_run:
+    workflows:
+      - build-on-push
+    types:
+      - completed
     branches:
-      - dev
+      - 'dependabot/**'
 
 jobs:
   dependabot-auto-merge:
@@ -12,4 +18,4 @@ jobs:
       contents: write
       pull-requests: write
       actions: write
-    uses: osslabz/github-actions/.github/workflows/dependabot-auto-merge.yml@v1
+    uses: osslabz/github-actions/.github/workflows/dependabot-merge-on-build.yml@v1
